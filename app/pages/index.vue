@@ -270,8 +270,6 @@ useHead({
 // Load seasons data from API
 const { data: seasons, pending, error } = await useFetch('/api/seasons')
 
-console.log(seasons.value)
-
 // Helper functions
 const hasMultipleEvents = (competition: any) => {
   return competition && competition.events && competition.events.length > 0
