@@ -194,8 +194,6 @@ const basePoints = computed(() => {
 const events = computed(() => {
   const eventsMap: Record<string, { name: string, category: string, maxPoints: number }> = {}
 
-  console.log(competitionsData.value, basePoints.value)
-
   if (competitionsData.value) {
     competitionsData.value.forEach((competition: any) => {
       if (competition.events && Array.isArray(competition.events)) {

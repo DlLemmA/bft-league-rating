@@ -92,7 +92,7 @@ export default defineEventHandler(async (event: any) => {
   }
 
   // Transform licenses and name mapping
-  const licenses = licensesData.body.map(transformLicense) || []
+  const licenses = licensesData.body.map(transformLicense).filter(license => license.id.startsWith('AG')) || []
   const nameMapping = nameMappingData?.body.map(transformNameMapping) || []
 
   const competitions = competitionsData.map((competitionData) => {
