@@ -1,0 +1,85 @@
+{
+  "categories": {
+    "Sprint": {
+      "name": "Спринт",
+      "basePoints": 700,
+      "defaultWinnerTime": {
+        "hours": 0,
+        "minutes": 50,
+        "seconds": 0
+      }
+    },
+    "Olympic": {
+      "name": "Олимпийка",
+      "basePoints": 800,
+      "defaultWinnerTime": {
+        "hours": 2,
+        "minutes": 5,
+        "seconds": 0
+      }
+    },
+    "HalfIronman": {
+      "name": "Половинка",
+      "basePoints": 900,
+      "defaultWinnerTime": {
+        "hours": 4,
+        "minutes": 10,
+        "seconds": 0
+      }
+    },
+    "Ironman": {
+      "name": "Полная",
+      "basePoints": 1000,
+      "defaultWinnerTime": {
+        "hours": 9,
+        "minutes": 30,
+        "seconds": 0
+      }
+    },
+    "Duathlon": {
+      "name": "Дуатлон",
+      "basePoints": 700,
+      "defaultWinnerTime": {
+        "hours": 0,
+        "minutes": 55,
+        "seconds": 0
+      }
+    },
+    "Kross": {
+      "name": "Кросс",
+      "basePoints": 700,
+      "defaultWinnerTime": {
+        "hours": 0,
+        "minutes": 45,
+        "seconds": 0
+      }
+    },
+    "WinterDuathlon": {
+      "name": "Зимний дуатлон",
+      "basePoints": 650,
+      "defaultWinnerTime": {
+        "hours": 0,
+        "minutes": 35,
+        "seconds": 0
+      }
+    }
+  },
+  "categoryMapping": {
+    "Sprint": "Спринт",
+    "Olympic": "Олимпийка",
+    "HalfIronman": "Половинка",
+    "Ironman": "Полная",
+    "Duathlon": "Дуатлон",
+    "Kross": "Кросс",
+    "WinterDuathlon": "Зимний дуатлон"
+  },
+  "eventDescriptions": {
+    "Sprint": "750м 🏊‍♂️ + 20км 🚴‍♂️ + 5км 🏃‍♂️",
+    "Olympic": "1.5км 🏊‍♂️ + 40км 🚴‍♂️ + 10км 🏃‍♂️",
+    "HalfIronman": "1.9км 🏊‍♂️ + 90км 🚴‍♂️ + 21.1км 🏃‍♂️",
+    "Ironman": "3.8км 🏊‍♂️ + 180км 🚴‍♂️ + 42.2км 🏃‍♂️",
+    "Duathlon": "5км 🏃‍♂️ + 20км 🚴‍♂️ + 2.5км 🏃‍♂️",
+    "Kross": "🌲",
+    "WinterDuathlon": "3км 🏃‍♂️ + 6км ⛷️"
+  }
+}

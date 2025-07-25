@@ -7,6 +7,23 @@ export default defineNuxtConfig({
     '@nuxt/content',
     '@nuxt/eslint',
     '@nuxt/ui',
-    '@nuxt/image'
-  ]
+    '@nuxt/image',
+  ],
+
+  css: ['~/assets/css/main.css'],
+
+  content: {
+    build: {
+      csv: {
+        json: true,
+        delimiter: ',',
+      },
+    },
+  },
+
+  eslint: {
+    config: {
+      stylistic: true,
+    },
+  },
 })
