@@ -1,0 +1,20 @@
+{
+  "slug": "svyatsk-triathlon",
+  "title": "Святский триатлон",
+  "description": "Триатлон в Святске",
+  "startDate": "2025-07-19",
+  "endDate": "2025-07-21",
+  "readerType": "athlinks",
+  "events": [
+    {
+      "slug": "olympic",
+      "title": "Олимпийка",
+      "category": "Olympic"
+    },
+    {
+      "slug": "sprint",
+      "title": "Спринт",
+      "category": "Sprint"
+    }
+  ]
+}

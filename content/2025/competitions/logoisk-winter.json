@@ -1,0 +1,20 @@
+{
+  "slug": "logoisk-winter",
+  "title": "Зимний триатлон. Логойск",
+  "description": "Зимний триатлон в Логойске",
+  "readerType": "logoiskWinter",
+  "startDate": "2025-02-21",
+  "endDate": "2025-02-23",
+  "events": [
+    {
+      "slug": "tri",
+      "title": "Зимний триатлон",
+      "category": "Kross"
+    },
+    {
+      "slug": "duo",
+      "title": "Зимний дуатлон",
+      "category": "WinterDuathlon"
+    }
+  ]
+}
