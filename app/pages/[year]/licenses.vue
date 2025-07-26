@@ -53,18 +53,7 @@
               <UIcon name="i-heroicons-user" class="mr-1" />
               Пол
             </label>
-            <select v-model="selectedGender"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="">
-                Все
-              </option>
-              <option value="Мужской">
-                Мужчины
-              </option>
-              <option value="Женский">
-                Женщины
-              </option>
-            </select>
+            <USelect v-model="selectedGender" :options="genderOptions" placeholder="Все" size="md" class="w-full" />
           </div>
 
           <div>
@@ -72,15 +61,8 @@
               <UIcon name="i-heroicons-tag" class="mr-1" />
               Возрастная группа
             </label>
-            <select v-model="selectedAgeGroup"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="">
-                Все группы
-              </option>
-              <option v-for="ag in ageGroups" :key="ag" :value="ag">
-                {{ ag }}
-              </option>
-            </select>
+            <USelect v-model="selectedAgeGroup" :options="ageGroupOptions" placeholder="Все группы" size="md"
+              class="w-full" />
           </div>
 
           <div>
@@ -88,15 +70,7 @@
               <UIcon name="i-heroicons-building-office" class="mr-1" />
               Клуб
             </label>
-            <select v-model="selectedClub"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="">
-                Все клубы
-              </option>
-              <option v-for="club in clubs" :key="club" :value="club">
-                {{ club }}
-              </option>
-            </select>
+            <USelect v-model="selectedClub" :options="clubOptions" placeholder="Все клубы" size="md" class="w-full" />
           </div>
         </div>
       </div>
@@ -434,6 +408,23 @@ const clubs = computed(() => {
   const clubSet = new Set(licenses.value.map(l => l.club).filter(Boolean))
   return Array.from(clubSet).sort()
 })
+
+// Options for USelect components
+const genderOptions = computed(() => [
+  { label: 'Все', value: '' },
+  { label: 'Мужчины', value: 'Мужской' },
+  { label: 'Женщины', value: 'Женский' }
+])
+
+const ageGroupOptions = computed(() => [
+  { label: 'Все группы', value: '' },
+  ...ageGroups.value.map(ag => ({ label: ag, value: ag }))
+])
+
+const clubOptions = computed(() => [
+  { label: 'Все клубы', value: '' },
+  ...clubs.value.map(club => ({ label: club, value: club }))
+])
 
 // Filtered licenses
 const filteredLicenses = computed(() => {
