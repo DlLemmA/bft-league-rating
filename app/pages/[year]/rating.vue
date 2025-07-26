@@ -58,15 +58,11 @@
               <UIcon name="i-heroicons-building-office" class="mr-1" />
               Клуб
             </label>
-            <select v-model="selectedClub" :disabled="availableClubs.length === 0"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed">
-              <option value="">
-                Все клубы
-              </option>
-              <option v-for="club in availableClubs" :key="club" :value="club">
-                {{ club }}
-              </option>
-            </select>
+            <USelect v-model="selectedClub" :options="clubOptions" :disabled="availableClubs.length === 0"
+              placeholder="Все клубы" size="md" class="w-full" />
+            <div v-if="availableClubs.length === 0" class="text-xs text-gray-500 mt-1">
+              Нет данных о клубах
+            </div>
           </div>
 
           <div>
@@ -74,15 +70,11 @@
               <UIcon name="i-heroicons-tag" class="mr-1" />
               Возрастная группа
             </label>
-            <select v-model="selectedAgeGroup" :disabled="availableAgeGroups.length === 0"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed">
-              <option value="">
-                Все группы
-              </option>
-              <option v-for="group in availableAgeGroups" :key="group" :value="group">
-                {{ group }}
-              </option>
-            </select>
+            <USelect v-model="selectedAgeGroup" :options="ageGroupOptions" :disabled="availableAgeGroups.length === 0"
+              placeholder="Все группы" size="md" class="w-full" />
+            <div v-if="availableAgeGroups.length === 0" class="text-xs text-gray-500 mt-1">
+              Нет данных о возрастных группах
+            </div>
           </div>
         </div>
       </div>
@@ -212,6 +204,17 @@ const availableAgeGroups = computed(() => {
   const ageGroupSet = new Set(ratingData.value.map((athlete: any) => athlete.ageGroup).filter(Boolean))
   return Array.from(ageGroupSet).sort()
 })
+
+// Options for USelect components
+const clubOptions = computed(() => [
+  { label: 'Все клубы', value: '' },
+  ...availableClubs.value.map(club => ({ label: club, value: club })),
+])
+
+const ageGroupOptions = computed(() => [
+  { label: 'Все группы', value: '' },
+  ...availableAgeGroups.value.map(group => ({ label: group, value: group })),
+])
 
 const menCount = computed(() => {
   if (!ratingData.value) return 0

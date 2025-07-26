@@ -20,13 +20,7 @@
       <form id="calculator-form" class="space-y-6" @submit.prevent>
         <div class="form-group">
           <label for="event-type" class="block text-sm font-medium text-gray-700 mb-1">Дистанция:</label>
-          <select id="event-type" v-model="selectedEvent"
-            class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-            <option v-for="(category, key) in competitionPointsData?.body?.categories" :key="key"
-              :value="category.name">
-              {{ category.name }} {{ eventDescriptions[key] || '' }}
-            </option>
-          </select>
+          <USelect v-model="selectedEvent" :options="eventOptions" placeholder="Выберите дистанцию" size="md" class="w-full" />
         </div>
 
         <div class="form-group">
@@ -237,6 +231,17 @@ const basePoints = computed(() => {
 
 const eventDescriptions = computed(() => {
   return competitionPointsData.value?.body?.eventDescriptions || {}
+})
+
+// Options for USelect component
+const eventOptions = computed(() => {
+  const categories = competitionPointsData.value?.body?.categories
+  if (!categories) return []
+  
+  return Object.entries(categories).map(([key, category]: [string, any]) => ({
+    label: `${category.name} ${eventDescriptions.value[key] || ''}`.trim(),
+    value: category.name
+  }))
 })
 
 // Reactive state
