@@ -1,10 +1,7 @@
 <template>
   <div class="container mx-auto px-4 py-8">
     <div class="mb-8">
-      <NuxtLink to="/" class="text-blue-600 hover:text-blue-800 mb-4 inline-block flex items-center">
-        <UIcon name="i-heroicons-arrow-left" class="mr-1" />
-        Главная
-      </NuxtLink>
+      <UBreadcrumb :items="breadcrumbLinks" class="mb-4" />
       <h1 class="text-4xl font-bold mb-2 flex items-center">
         <UIcon name="i-heroicons-trophy" class="mr-3 text-blue-600" size="lg" />
         {{ competitionData?.title || 'Соревнование' }}
@@ -263,9 +260,24 @@ if (!competitionData.value) {
 
 // Page metadata
 useHead({
-  title: `${competitionData.value.title} ${year} - Результаты`,
+  title: `${competitionData.value.title} ${year} - Результаты | ЛЛТ`,
   meta: [
-    { name: 'description', content: `Результаты соревнований ${competitionData.value.title} ${year} года` },
+    { 
+      name: 'description', 
+      content: `Результаты соревнований ${competitionData.value.title} ${year} года. Рейтинг участников, статистика, детальные результаты по дистанциям. Любительская Лига Триатлона Беларуси.` 
+    },
+    { 
+      property: 'og:title', 
+      content: `${competitionData.value.title} ${year} - Результаты | ЛЛТ` 
+    },
+    { 
+      property: 'og:description', 
+      content: `Результаты соревнований ${competitionData.value.title} ${year} года. Рейтинг участников, статистика, детальные результаты по дистанциям.` 
+    },
+    { 
+      property: 'og:type', 
+      content: 'website' 
+    },
   ],
 })
 
@@ -275,6 +287,19 @@ const selectedEvent = ref(null)
 // State for result details drawer
 const selectedResult = ref(null)
 const showDetailsDrawer = ref(false)
+
+// Breadcrumb navigation
+const breadcrumbLinks = computed(() => [
+  {
+    label: 'Главная',
+    to: '/',
+    icon: 'i-heroicons-home'
+  },
+  {
+    label: competitionData.value?.title || 'Соревнование',
+    icon: 'i-heroicons-flag'
+  }
+])
 
 // Computed properties
 const hasMultipleEvents = computed(() => {

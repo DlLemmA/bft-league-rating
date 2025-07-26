@@ -1,12 +1,10 @@
 <template>
   <div class="container mx-auto px-4 py-8">
     <div class="mb-8">
-      <NuxtLink to="/" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">
-        <UIcon name="i-heroicons-arrow-left" class="mr-1" />
-        На главную
-      </NuxtLink>
+      <UBreadcrumb :items="breadcrumbLinks" class="mb-4" />
       <h1 class="text-4xl font-bold mb-2">
-        Калькулятор очков за дистанцию
+        <span class="hidden sm:inline">Калькулятор очков за дистанцию</span>
+        <span class="sm:hidden">Калькулятор очков</span>
       </h1>
 
       <!-- Pre-filled data indicator -->
@@ -190,11 +188,24 @@ import { useUrlSearchParams } from '@vueuse/core'
 const route = useRoute()
 const year = route.params.year as string
 
-// Page metadata
+// Breadcrumb navigation
+const breadcrumbLinks = [
+  {
+    label: 'Главная',
+    to: '/',
+    icon: 'i-heroicons-home'
+  },
+  {
+    label: 'Калькулятор очков за дистанцию',
+    icon: 'i-heroicons-calculator'
+  }
+]
+
+// Page metadata - mobile optimized title
 useHead({
-  title: `Калькулятор очков за дистанцию - ${year}`,
+  title: `Калькулятор очков ${year}`,
   meta: [
-    { name: 'description', content: `Калькулятор очков за дистанцию для соревнований Любительской Лиги триатлона ${year}` },
+    { name: 'description', content: `Рассчитайте очки за дистанцию в соревнованиях Любительской Лиги триатлона ${year}. Введите время победителя и ваше время для автоматического расчета очков по официальной формуле.` },
   ],
 })
 

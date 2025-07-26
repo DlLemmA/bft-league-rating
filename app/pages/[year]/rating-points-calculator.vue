@@ -1,12 +1,13 @@
 <template>
   <div class="container mx-auto px-4 py-8">
     <div class="mb-8">
-      <NuxtLink to="/" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">
-        <UIcon name="i-heroicons-arrow-left" class="mr-1" />
-        На главную
-      </NuxtLink>
-      <h1 class="text-4xl font-bold mb-2">
-        Калькулятор очков рейтинга {{ year }}
+      <!-- Breadcrumb navigation -->
+      <UBreadcrumb class="mb-4" :items="breadcrumbLinks" />
+      
+      <!-- Page title with mobile optimization -->
+      <h1 class="text-4xl md:text-4xl font-bold mb-2">
+        <span class="hidden sm:inline">Калькулятор рейтинга {{ year }}</span>
+        <span class="sm:hidden">Калькулятор рейтинга</span>
       </h1>
 
       <!-- Pre-filled data indicator -->
@@ -164,11 +165,24 @@ import { useUrlSearchParams } from "@vueuse/core";
 const route = useRoute()
 const year = route.params.year as string
 
-// Page metadata
+// Breadcrumb navigation
+const breadcrumbLinks = [
+  {
+    label: 'Главная',
+    to: '/',
+    icon: 'i-heroicons-home'
+  },
+  {
+    label: 'Калькулятор рейтинга',
+    icon: 'i-heroicons-calculator'
+  }
+]
+
+// Page metadata - mobile optimized title
 useHead({
-  title: `Калькулятор очков рейтинга - ${year}`,
+  title: `Калькулятор рейтинга ${year}`,
   meta: [
-    { name: 'description', content: `Калькулятор очков рейтинга для соревнований Любительской Лиги триатлона ${year}` },
+    { name: 'description', content: `Рассчитайте очки рейтинга в соревнованиях Любительской Лиги триатлона ${year}. Введите результаты соревнований для автоматического расчета итогового рейтинга по официальной формуле.` },
   ],
 })
 

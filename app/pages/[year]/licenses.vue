@@ -2,16 +2,13 @@
   <div class="container mx-auto px-4 py-8">
     <!-- Page Header -->
     <div class="mb-8">
-      <NuxtLink to="/" class="text-blue-600 hover:text-blue-800 mb-4 inline-block flex items-center">
-        <UIcon name="i-heroicons-arrow-left" class="mr-1" />
-        Главная
-      </NuxtLink>
+      <UBreadcrumb :items="breadcrumbLinks" class="mb-4" />
       <h1 class="text-4xl font-bold mb-2 flex items-center">
         <UIcon name="i-heroicons-identification" class="mr-3 text-blue-600" size="lg" />
-        Лицензии спортсменов {{ year }}
+        Лицензии {{ year }}
       </h1>
       <p class="text-gray-600">
-        База данных лицензированных участников Любительской Лиги триатлона
+        База данных лицензированных участников Любительской Лиги триатлона за {{ year }} год
       </p>
     </div>
 
@@ -383,16 +380,34 @@
 </template>
 
 <script setup lang="ts">
-// Page metadata
+const route = useRoute()
+const year = route.params.year as string
+
+// Page metadata - mobile optimized title
 useHead({
-  title: `Лицензии спортсменов - Рейтинг Любительской Лиги триатлона`,
+  title: `Лицензии ${year}`,
   meta: [
-    { name: 'description', content: 'База данных лицензированных участников Любительской Лиги триатлона Беларуси' },
+    { name: 'description', content: `База данных лицензированных участников Любительской Лиги триатлона Беларуси за ${year} год. Полный список спортсменов с лицензиями, возрастными группами и клубами.` },
+    { name: 'keywords', content: `лицензии, триатлон, Беларусь, ${year}, спортсмены, участники, клубы` },
+    { property: 'og:title', content: `Лицензии ${year} - Любительская Лига Триатлона` },
+    { property: 'og:description', content: `База данных лицензированных участников Любительской Лиги триатлона Беларуси за ${year} год` },
+    { property: 'og:type', content: 'website' },
   ],
 })
 
-const route = useRoute()
-const year = route.params.year as string
+
+// Breadcrumb navigation
+const breadcrumbLinks = [
+  {
+    label: 'Главная',
+    to: '/',
+    icon: 'i-heroicons-home'
+  },
+  {
+    label: `Лицензии ${year}`,
+    icon: 'i-heroicons-identification'
+  }
+]
 
 // Load licenses data from API
 const { data: licenses, pending, error } = await useFetch(`/api/${year}/licenses`)

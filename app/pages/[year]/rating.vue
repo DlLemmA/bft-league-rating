@@ -1,10 +1,13 @@
 <template>
   <div class="container mx-auto px-4 py-8">
     <div class="mb-8">
-      <NuxtLink to="/" class="text-blue-600 hover:text-blue-800 mb-4 inline-block flex items-center">
-        <UIcon name="i-heroicons-arrow-left" class="mr-1" />
-        Главная
-      </NuxtLink>
+      <UBreadcrumb 
+        :items="[
+          { label: 'Главная', to: '/', icon: 'i-heroicons-home' },
+          { label: `Рейтинг ${year}` }
+        ]" 
+        class="mb-4"
+      />
       <h1 class="text-4xl font-bold mb-2 flex items-center">
         <UIcon name="i-heroicons-trophy" class="mr-3 text-blue-600" size="lg" />
         Рейтинг спортсменов {{ year }}
@@ -146,10 +149,13 @@ import CompetitionDetailsDrawer from '~/components/CompetitionDetailsDrawer.vue'
 const route = useRoute()
 const year = route.params.year as string
 
+// Mobile-optimized title
 useHead({
-  title: `Рейтинг спортсменов ${route.params.year} - Рейтинг Любительской Лиги триатлона`,
+  title: `Рейтинг ${route.params.year}`,
   meta: [
-    { name: 'description', content: 'База данных лицензированных участников Любительской Лиги триатлона Беларуси' },
+    { name: 'description', content: `Рейтинг лицензированных участников Любительской Лиги триатлона Беларуси за ${route.params.year} год. Результаты соревнований, очки и места спортсменов.` },
+    { property: 'og:title', content: `Рейтинг ${route.params.year} - Любительская Лига Триатлона` },
+    { property: 'og:description', content: `Рейтинг лицензированных участников Любительской Лиги триатлона Беларуси за ${route.params.year} год. Результаты соревнований, очки и места спортсменов.` },
   ],
 })
 
