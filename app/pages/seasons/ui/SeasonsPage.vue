@@ -2,13 +2,11 @@
   <UContainer class="py-4">
     <!-- Header -->
     <div class="mb-8 text-center">
-      <h1 class="text-3xl sm:text-4xl text-pretty font-bold text-highlighted">
+      <h1 class="text-3xl sm:text-4xl text-pretty font-bold text-highlighted mb-6">
         Любительская Лига Триатлона Беларуси
       </h1>
-      <p class="text-lg text-pretty text-muted mt-4">
-        Неофициальный сайт Любительской Лиги Триатлона Беларуси. Рейтинги спортсменов, результаты соревнований,
-        календарь событий и калькуляторы очков по всем сезонам.
-      </p>
+      <!-- Visual separator -->
+      <div class="w-24 h-1 bg-gradient-to-r from-blue-500 to-blue-600 mx-auto rounded-full"></div>
     </div>
 
     <!-- Loading State -->
@@ -44,6 +42,13 @@
         :season="season"
         :year="year"
       />
+      
+      <!-- Subtle footer disclaimer -->
+      <div class="text-center pt-8 pb-4 border-t border-gray-200 mt-16">
+        <p class="text-sm text-gray-500">
+          Неофициальный сайт Любительской Лиги Триатлона Беларуси
+        </p>
+      </div>
     </div>
   </UContainer>
 </template>

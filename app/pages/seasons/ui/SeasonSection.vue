@@ -1,81 +1,79 @@
 <template>
   <section class="space-y-8">
-    <!-- Season Header -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-      <h2 class="text-3xl font-bold">
-        Сезон {{ year }}
-      </h2>
-      <div class="flex flex-wrap gap-2 mt-2 md:mt-0">
+    <!-- Season Header with Priority Actions -->
+    <div class="flex flex-col space-y-3 sm:space-y-0">
+      <!-- Mobile layout: stacked -->
+      <div class="flex items-center justify-between sm:hidden">
+        <h2 class="text-2xl font-bold">
+          Сезон {{ year }}
+        </h2>
+        <!-- Compact stats on mobile -->
+        <div class="flex items-center space-x-3 text-sm text-gray-600">
+          <span class="flex items-center">
+            <UIcon name="i-heroicons-users" class="mr-1" size="14" />
+            {{ season.statistics.all }}
+          </span>
+          <span class="flex items-center">
+            <UIcon name="i-heroicons-trophy" class="mr-1" size="14" />
+            {{ season.statistics.competitionsWithResults }}/{{ season.statistics.competitionsCount }}
+          </span>
+        </div>
+      </div>
+      
+      <!-- Desktop layout: same line -->
+      <div class="hidden sm:flex sm:items-center sm:justify-between">
+        <h2 class="text-3xl font-bold">
+          Сезон {{ year }}
+        </h2>
+        <div class="flex gap-3">
+          <NuxtLink :to="`/${year}/rating`"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition flex items-center font-medium">
+            <UIcon name="i-heroicons-chart-bar" class="mr-2" size="18" />
+            Рейтинг
+          </NuxtLink>
+          <NuxtLink :to="`/${year}/licenses`"
+            class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-6 py-3 rounded-lg transition flex items-center">
+            <UIcon name="i-heroicons-identification" class="mr-2" size="18" />
+            Лицензии
+          </NuxtLink>
+        </div>
+      </div>
+      
+      <!-- Mobile buttons (below title) -->
+      <div class="flex gap-3 sm:hidden">
         <NuxtLink :to="`/${year}/rating`"
-          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition flex items-center">
-          <UIcon name="i-heroicons-chart-bar" class="mr-1" />
-          Рейтинг {{ year }}
+          class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition flex items-center font-medium">
+          <UIcon name="i-heroicons-chart-bar" class="mr-2" size="18" />
+          Рейтинг
         </NuxtLink>
         <NuxtLink :to="`/${year}/licenses`"
-          class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg transition flex items-center">
-          <UIcon name="i-heroicons-identification" class="mr-1" />
+          class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-6 py-3 rounded-lg transition flex items-center">
+          <UIcon name="i-heroicons-identification" class="mr-2" size="18" />
           Лицензии
-        </NuxtLink>
-        <NuxtLink :to="`/${year}/distance-points-calculator`"
-          class="bg-green-100 hover:bg-green-200 text-green-800 px-4 py-2 rounded-lg transition flex items-center">
-          <UIcon name="i-heroicons-calculator" class="mr-1" />
-          Калькулятор очков
-        </NuxtLink>
-        <NuxtLink :to="`/${year}/rating-points-calculator`"
-          class="bg-purple-100 hover:bg-purple-200 text-purple-800 px-4 py-2 rounded-lg transition flex items-center">
-          <UIcon name="i-heroicons-academic-cap" class="mr-1" />
-          Калькулятор рейтинга
         </NuxtLink>
       </div>
     </div>
 
-    <!-- Season Statistics -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <div class="bg-blue-50 rounded-lg p-6">
-        <div class="flex items-center mb-2">
-          <UIcon name="i-heroicons-users" class="text-blue-600 mr-2" size="lg" />
-          <div class="text-gray-600">
-            Всего участников
+    <!-- Compact Statistics (desktop only) -->
+    <div class="hidden sm:block">
+      <div class="bg-gray-50 rounded-lg p-4">
+        <div class="grid grid-cols-4 gap-6 text-center">
+          <div>
+            <div class="text-2xl font-bold text-blue-600">{{ season.statistics.all }}</div>
+            <div class="text-sm text-gray-600">Участников</div>
           </div>
-        </div>
-        <div class="text-3xl font-bold text-blue-600">
-          {{ season.statistics.all }}
-        </div>
-      </div>
-
-      <div class="bg-green-50 rounded-lg p-6">
-        <div class="flex items-center mb-2">
-          <UIcon name="i-heroicons-user" class="text-green-600 mr-2" size="lg" />
-          <div class="text-gray-600">
-            Мужчин
+          <div>
+            <div class="text-2xl font-bold text-green-600">{{ season.statistics.men }}</div>
+            <div class="text-sm text-gray-600">Мужчин</div>
           </div>
-        </div>
-        <div class="text-3xl font-bold text-green-600">
-          {{ season.statistics.men }}
-        </div>
-      </div>
-
-      <div class="bg-pink-50 rounded-lg p-6">
-        <div class="flex items-center mb-2">
-          <UIcon name="i-heroicons-user" class="text-pink-600 mr-2" size="lg" />
-          <div class="text-gray-600">
-            Женщин
+          <div>
+            <div class="text-2xl font-bold text-pink-600">{{ season.statistics.women }}</div>
+            <div class="text-sm text-gray-600">Женщин</div>
           </div>
-        </div>
-        <div class="text-3xl font-bold text-pink-600">
-          {{ season.statistics.women }}
-        </div>
-      </div>
-
-      <div class="bg-purple-50 rounded-lg p-6">
-        <div class="flex items-center mb-2">
-          <UIcon name="i-heroicons-trophy" class="text-purple-600 mr-2" size="lg" />
-          <div class="text-gray-600">
-            Соревнований проведено
+          <div>
+            <div class="text-2xl font-bold text-purple-600">{{ season.statistics.competitionsWithResults }}/{{ season.statistics.competitionsCount }}</div>
+            <div class="text-sm text-gray-600">Соревнований</div>
           </div>
-        </div>
-        <div class="text-3xl font-bold text-purple-600">
-          {{ season.statistics.competitionsWithResults }}/{{ season.statistics.competitionsCount }}
         </div>
       </div>
     </div>
@@ -117,7 +115,8 @@
         Соревнования {{ year }}
       </h3>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Mobile-first responsive grid with consistent heights -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-stretch">
         <CompetitionCard v-for="competition in sortedCompetitions(season.competitions)" :key="competition.slug"
           :competition="competition" :year="year" />
       </div>
