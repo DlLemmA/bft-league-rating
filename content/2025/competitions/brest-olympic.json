@@ -3,6 +3,7 @@
   "title": "Брестская олимпийка",
   "description": "Олимпийская дистанция триатлона в Бресте",
   "category": "Olympic",
+  "readerType": "athlinks",
   "startDate": "2025-07-25",
   "endDate": "2025-07-27"
 }
