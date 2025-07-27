@@ -13,6 +13,10 @@ export default defineNuxtConfig({
       path: '~/pages',
       pathPrefix: false,
     },
+    {
+      path: '~/shared',
+      pathPrefix: false,
+    },
   ],
   devtools: { enabled: true },
 

@@ -54,27 +54,37 @@
       </div>
     </div>
 
-    <!-- Compact Statistics (desktop only) -->
+    <!-- Statistics Cards -->
     <div class="hidden sm:block">
-      <div class="bg-gray-50 rounded-lg p-4">
-        <div class="grid grid-cols-4 gap-6 text-center">
-          <div>
-            <div class="text-2xl font-bold text-blue-600">{{ season.statistics.all }}</div>
-            <div class="text-sm text-gray-600">Участников</div>
-          </div>
-          <div>
-            <div class="text-2xl font-bold text-green-600">{{ season.statistics.men }}</div>
-            <div class="text-sm text-gray-600">Мужчин</div>
-          </div>
-          <div>
-            <div class="text-2xl font-bold text-pink-600">{{ season.statistics.women }}</div>
-            <div class="text-sm text-gray-600">Женщин</div>
-          </div>
-          <div>
-            <div class="text-2xl font-bold text-purple-600">{{ season.statistics.competitionsWithResults }}/{{ season.statistics.competitionsCount }}</div>
-            <div class="text-sm text-gray-600">Соревнований</div>
-          </div>
-        </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatisticCard 
+          :value="season.statistics.all"
+          label="Участников"
+          icon="i-heroicons-users"
+          icon-color="text-blue-600"
+          value-color="text-blue-600"
+        />
+        <StatisticCard 
+          :value="season.statistics.men"
+          label="Мужчин"
+          icon="i-heroicons-user"
+          icon-color="text-green-600"
+          value-color="text-green-600"
+        />
+        <StatisticCard 
+          :value="season.statistics.women"
+          label="Женщин"
+          icon="i-heroicons-user"
+          icon-color="text-pink-600"
+          value-color="text-pink-600"
+        />
+        <StatisticCard 
+          :value="`${season.statistics.competitionsWithResults}/${season.statistics.competitionsCount}`"
+          label="Соревнований"
+          icon="i-heroicons-trophy"
+          icon-color="text-purple-600"
+          value-color="text-purple-600"
+        />
       </div>
     </div>
 

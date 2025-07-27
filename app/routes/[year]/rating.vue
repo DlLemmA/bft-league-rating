@@ -1,18 +1,11 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
-    <div class="mb-8">
-      <UBreadcrumb :items="[
-        { label: 'Главная', to: '/', icon: 'i-heroicons-home' },
-        { label: `Рейтинг ${year}` }
-      ]" class="mb-4" />
-      <h1 class="text-4xl font-bold mb-2 flex items-center">
-        <UIcon name="i-heroicons-trophy" class="mr-3 text-blue-600" size="lg" />
-        Рейтинг спортсменов {{ year }}
-      </h1>
-      <p class="text-gray-600">
-        Рейтинг лицензированных участников Любительской Лиги триатлона Беларуси
-      </p>
-    </div>
+  <!-- Page Header -->
+  <div class="mb-6">
+    <UBreadcrumb :items="[
+      { label: 'Главная', to: '/', icon: 'i-heroicons-home' },
+      { label: `Рейтинг ${year}` }
+    ]" class="mb-4" />
+  </div>
 
     <div v-if="pending" class="text-center py-12">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
@@ -30,47 +23,87 @@
     </div>
 
     <div v-else class="space-y-8">
-      <!-- Rating Statistics Cards -->
-      <RatingStatisticsCards :statistics="ratingStatistics" />
+      <!-- Statistics Cards (desktop only) -->
+      <div class="hidden sm:block mb-6">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatisticCard 
+            :value="ratingStatistics.total"
+            label="Участников"
+            icon="i-heroicons-users"
+            icon-color="text-blue-600"
+            value-color="text-blue-600"
+          />
+          <StatisticCard 
+            :value="ratingStatistics.men"
+            label="Мужчин"
+            icon="i-heroicons-user"
+            icon-color="text-green-600"
+            value-color="text-green-600"
+          />
+          <StatisticCard 
+            :value="ratingStatistics.women"
+            label="Женщин"
+            icon="i-heroicons-user"
+            icon-color="text-pink-600"
+            value-color="text-pink-600"
+          />
+          <StatisticCard 
+            :value="ratingStatistics.competitions"
+            label="Соревнований"
+            icon="i-heroicons-flag"
+            icon-color="text-purple-600"
+            value-color="text-purple-600"
+          />
+        </div>
+      </div>
 
       <!-- Search and Filters -->
-      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 mb-6">
-        <h2 class="text-lg font-semibold mb-4 flex items-center">
+      <div class="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+        <h2 class="text-lg font-semibold mb-4 flex items-center sm:hidden">
           <UIcon name="i-heroicons-funnel" class="mr-2 text-blue-600" />
+          Фильтры
+        </h2>
+        <h2 class="hidden sm:flex text-lg font-semibold mb-4 items-center">
+          <UIcon name="i filtecons-funnel" class="mr-2 text-blue-600" />
           Фильтры и поиск
         </h2>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
+        <div class="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-1 md:grid-cols-3 sm:gap-4">
+          <!-- Search -->
+          <div class="sm:col-span-1">
             <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-              <UIcon name="i-heroicons-magnifying-glass" class="mr-1" />
-              Поиск по имени или клубу
+              <UIcon name="i-heroicons-magnifying-glass" class="mr-1" size="16" />
+              Поиск
             </label>
-            <input v-model="searchQuery" type="text" placeholder="Введите имя или название клуба..."
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <UInput v-model="searchQuery" type="text" placeholder="Имя спортсмена..." size="md" class="w-full" />
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-              <UIcon name="i-heroicons-building-office" class="mr-1" />
-              Клуб
-            </label>
-            <USelect v-model="selectedClub" :options="clubOptions" :disabled="availableClubs.length === 0"
-              placeholder="Все клубы" size="md" class="w-full" />
-            <div v-if="availableClubs.length === 0" class="text-xs text-gray-500 mt-1">
-              Нет данных о клубах
+          <!-- Filters in a row on mobile -->
+          <div class="grid grid-cols-2 gap-3 sm:col-span-2 sm:grid-cols-2 sm:gap-4">
+            <!-- Club filter -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                <UIcon name="i-heroicons-building-office" class="mr-1" size="16" />
+                Клуб
+              </label>
+              <USelect v-model="selectedClub" :options="clubOptions" :disabled="availableClubs.length === 0"
+                placeholder="Все клубы" size="md" class="w-full" />
+              <div v-if="availableClubs.length === 0" class="text-xs text-gray-500 mt-1">
+                Нет данных
+              </div>
             </div>
-          </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-              <UIcon name="i-heroicons-tag" class="mr-1" />
-              Возрастная группа
-            </label>
-            <USelect v-model="selectedAgeGroup" :options="ageGroupOptions" :disabled="availableAgeGroups.length === 0"
-              placeholder="Все группы" size="md" class="w-full" />
-            <div v-if="availableAgeGroups.length === 0" class="text-xs text-gray-500 mt-1">
-              Нет данных о возрастных группах
+            <!-- Age group filter -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                <UIcon name="i-heroicons-tag" class="mr-1" size="16" />
+                Возраст
+              </label>
+              <USelect v-model="selectedAgeGroup" :options="ageGroupOptions" :disabled="availableAgeGroups.length === 0"
+                placeholder="Все группы" size="md" class="w-full" />
+              <div v-if="availableAgeGroups.length === 0" class="text-xs text-gray-500 mt-1">
+                Нет данных
+              </div>
             </div>
           </div>
         </div>
@@ -78,46 +111,46 @@
 
       <!-- Rating Table with Tabs -->
       <UTabs :items="ratingTabs" :default-index="activeTabIndex"
-        class="bg-white rounded-xl shadow-md border border-gray-100" @change="handleTabChange">
+        class="bg-white rounded-lg shadow-sm border border-gray-200" @change="handleTabChange">
         <template #content="{ item }">
           <div v-if="item.key === 'all'" class="space-y-4">
-            <h3 class="text-xl font-bold flex items-center justify-between px-6 py-4 border-b border-gray-100">
-              <div class="flex items-center">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-6 py-4 border-b border-gray-100">
+              <div class="flex items-center mb-2 sm:mb-0">
                 <UIcon name="i-heroicons-users" class="mr-2 text-blue-600" />
-                Все спортсмены
+                <h3 class="text-lg sm:text-xl font-bold">Все</h3>
               </div>
               <span class="text-sm text-gray-500">
                 Найдено: {{ filteredRatingData.length }} из {{ ratingData?.length || 0 }}
               </span>
-            </h3>
+            </div>
 
             <RatingTable :athletes="filteredRatingData" @show-details="showAthleteDetails" />
           </div>
 
           <div v-else-if="item.key === 'men'" class="space-y-4">
-            <h3 class="text-xl font-bold flex items-center justify-between px-6 py-4 border-b border-gray-100">
-              <div class="flex items-center">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-6 py-4 border-b border-gray-100">
+              <div class="flex items-center mb-2 sm:mb-0">
                 <UIcon name="i-heroicons-user" class="mr-2 text-green-600" />
-                Мужчины
+                <h3 class="text-lg sm:text-xl font-bold">Мужчины</h3>
               </div>
               <span class="text-sm text-gray-500">
                 Найдено: {{ filteredMenData.length }} из {{ menCount }}
               </span>
-            </h3>
+            </div>
 
             <RatingTable :athletes="filteredMenData" @show-details="showAthleteDetails" />
           </div>
 
           <div v-else-if="item.key === 'women'" class="space-y-4">
-            <h3 class="text-xl font-bold flex items-center justify-between px-6 py-4 border-b border-gray-100">
-              <div class="flex items-center">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-6 py-4 border-b border-gray-100">
+              <div class="flex items-center mb-2 sm:mb-0">
                 <UIcon name="i-heroicons-user" class="mr-2 text-pink-600" />
-                Женщины
+                <h3 class="text-lg sm:text-xl font-bold">Женщины</h3>
               </div>
               <span class="text-sm text-gray-500">
                 Найдено: {{ filteredWomenData.length }} из {{ womenCount }}
               </span>
-            </h3>
+            </div>
 
             <RatingTable :athletes="filteredWomenData" @show-details="showAthleteDetails" />
           </div>
@@ -127,7 +160,6 @@
       <!-- Rating Details Drawer -->
       <RatingDetailsDrawer v-model:open="showDetailsDrawer" :athlete="selectedAthlete" />
     </div>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -161,7 +193,7 @@ const activeTab = ref<'all' | 'men' | 'women'>('all')
 const ratingTabs = [
   {
     key: 'all',
-    label: 'Все спортсмены',
+    label: 'Все',
     icon: 'i-heroicons-users',
   },
   {
@@ -257,8 +289,7 @@ const filteredRatingData = computed(() => {
     const query = searchQuery.value.toLowerCase()
     filtered = filtered.filter((athlete: any) =>
       athlete.fioRussian.toLowerCase().includes(query)
-      || athlete.fioEnglish.toLowerCase().includes(query)
-      || (athlete.club && athlete.club.toLowerCase().includes(query)),
+      || athlete.fioEnglish.toLowerCase().includes(query),
     )
   }
 
@@ -315,8 +346,7 @@ const filteredWomenData = computed(() => {
     const query = searchQuery.value.toLowerCase()
     filtered = filtered.filter((athlete: any) =>
       athlete.fioRussian.toLowerCase().includes(query)
-      || athlete.fioEnglish.toLowerCase().includes(query)
-      || (athlete.club && athlete.club.toLowerCase().includes(query)),
+      || athlete.fioEnglish.toLowerCase().includes(query),
     )
   }
 

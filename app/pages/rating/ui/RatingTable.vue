@@ -41,15 +41,44 @@
           <tr v-for="(athlete, index) in athletes" :key="athlete.id" class="hover:bg-gray-50 cursor-pointer"
             @click="$emit('show-details', athlete)">
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="flex flex-col space-y-1">
-                <!-- Show places in order of priority -->
-                <div v-for="(ranking, rankingIndex) in getAthleteRankings(athlete)" :key="rankingIndex" :class="[
-                  rankingIndex === 0 ? 'text-sm font-medium' : 'text-xs text-gray-600',
-                  ranking.highlighted ? ranking.color : '',
-                ]" class="flex items-center">
-                  <span v-if="ranking.medal" class="mr-1" :class="ranking.medalColor">{{ ranking.medal }}</span>
-                  {{ ranking.value }}
-                  <span v-if="ranking.suffix" class="ml-1" :class="ranking.suffixClass">{{ ranking.suffix }}</span>
+              <div class="grid grid-cols-3 gap-2 text-xs">
+                <!-- Absolute Place -->
+                <div :class="[
+                  'text-center p-1 rounded',
+                  getBestPlaceType(athlete) === 'absolute' ? 'bg-yellow-100 border border-yellow-300' : 'bg-gray-50'
+                ]">
+                  <div class="text-xs text-gray-500 mb-1">Общий</div>
+                  <div :class="getBestPlaceType(athlete) === 'absolute' ? 'text-yellow-700 font-bold' : 'text-gray-700'">
+                    {{ athlete.absolutePlace || '—' }}
+                  </div>
+                </div>
+                
+                <!-- Gender Place -->
+                <div :class="[
+                  'text-center p-1 rounded',
+                  getBestPlaceType(athlete) === 'gender' ? (athlete.gender === 'Мужской' ? 'bg-blue-100 border border-blue-300' : 'bg-pink-100 border border-pink-300') : 'bg-gray-50'
+                ]">
+                  <div class="text-xs text-gray-500 mb-1">{{ athlete.gender === 'Мужской' ? 'М' : 'Ж' }}</div>
+                  <div :class="getBestPlaceType(athlete) === 'gender' ? (athlete.gender === 'Мужской' ? 'text-blue-700 font-bold' : 'text-pink-700 font-bold') : 'text-gray-700'">
+                    <span v-if="athlete.genderPlace <= 3" class="mr-1">
+                      {{ athlete.genderPlace === 1 ? '🥇' : athlete.genderPlace === 2 ? '🥈' : '🥉' }}
+                    </span>
+                    {{ athlete.genderPlace || '—' }}
+                  </div>
+                </div>
+                
+                <!-- Age Group Place -->
+                <div :class="[
+                  'text-center p-1 rounded',
+                  getBestPlaceType(athlete) === 'ageGroup' ? 'bg-purple-100 border border-purple-300' : 'bg-gray-50'
+                ]">
+                  <div class="text-xs text-gray-500 mb-1">{{ athlete.ageGroup ? athlete.ageGroup.substring(0, 3) : 'Возр' }}</div>
+                  <div :class="getBestPlaceType(athlete) === 'ageGroup' ? 'text-purple-700 font-bold' : 'text-gray-700'">
+                    <span v-if="athlete.ageGroupPlace <= 3" class="mr-1">
+                      {{ athlete.ageGroupPlace === 1 ? '🥇' : athlete.ageGroupPlace === 2 ? '🥈' : '🥉' }}
+                    </span>
+                    {{ athlete.ageGroupPlace || '—' }}
+                  </div>
                 </div>
               </div>
             </td>
@@ -98,67 +127,102 @@
     </div>
 
     <!-- Mobile Rating Cards -->
-    <div class="md:hidden space-y-4">
+    <div class="md:hidden space-y-3">
       <div v-for="(athlete, index) in athletes" :key="athlete.id"
-        class="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500 cursor-pointer"
+        class="bg-white rounded-lg border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors"
         @click="$emit('show-details', athlete)">
-        <div class="flex justify-between items-start mb-3">
-          <div class="flex items-center">
-            <!-- Badge with highest achievement -->
-            <div :class="[
-              'rounded-full h-8 w-8 flex items-center justify-center mr-2',
-              getTopRanking(athlete) && getTopRanking(athlete).badgeClass ? getTopRanking(athlete).badgeClass : 'bg-gray-100',
-            ]">
-              <span v-if="getTopRanking(athlete) && getTopRanking(athlete).medal"
-                :class="getTopRanking(athlete) && getTopRanking(athlete).medalColor ? getTopRanking(athlete).medalColor : ''"
-                class="font-bold">
-                {{ getTopRanking(athlete).medal }}
-              </span>
-              <span v-else class="text-sm font-medium">{{ athlete && athlete.absolutePlace ? athlete.absolutePlace : ''
-                }}</span>
-            </div>
-            <div>
-              <div class="flex items-center space-x-3">
+        
+        <!-- Card Header -->
+        <div class="p-4 pb-3">
+          <div class="flex items-start justify-between mb-3">
+            <!-- Athlete Info -->
+            <div class="flex items-center flex-1 min-w-0">
+              <!-- Avatar -->
+              <div class="flex-shrink-0 mr-3">
                 <UAvatar :src="athlete.avatarSrc" :alt="athlete.fioRussian" size="sm" />
-                <div>
-                  <div class="font-medium">
-                    {{ athlete.fioRussian }}
-                  </div>
-                  <div class="text-xs text-gray-500">
-                    {{ athlete.fioEnglish }}
-                  </div>
+              </div>
+              
+              <!-- Name and Details -->
+              <div class="flex-1 min-w-0">
+                <h3 class="font-semibold text-gray-900 truncate">
+                  {{ athlete.fioRussian }}
+                </h3>
+                <div class="flex items-center text-sm text-gray-600 mt-1">
+                  <UIcon name="i-heroicons-identification" class="mr-1" size="14" />
+                  <span class="mr-3">№{{ athlete.id }}</span>
+                  <UIcon name="i-heroicons-user" class="mr-1" size="14" />
+                  <span>{{ athlete.gender === 'Мужской' ? 'Мужчины' : 'Женщины' }}</span>
                 </div>
               </div>
-              <div class="text-xs text-gray-500 flex flex-wrap items-center gap-1 mt-1">
-                <span v-if="athlete.club">{{ athlete.club }}</span>
-                <span v-if="athlete.club && athlete.ageGroup" class="mx-1">•</span>
-                <span v-if="athlete.ageGroup"
-                  class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
-                  {{ athlete.ageGroup }}
-                </span>
-
-                <!-- Show positions with priority -->
-                <span v-for="(ranking, rankingIndex) in getAthleteRankings(athlete)" :key="rankingIndex" :class="[
-                  'ml-1 px-1.5 py-0.5 rounded text-xs',
-                  ranking && ranking.badgeClass ? ranking.badgeClass : '',
-                ]">
-                  {{ ranking ? ranking.mobileLabel : '' }}
-                  <span v-if="ranking && ranking.medal">{{ ranking.medal }}</span>
-                </span>
+            </div>
+            
+            <!-- Points -->
+            <div class="flex-shrink-0 text-right">
+              <div class="text-lg font-bold text-blue-600">
+                {{ formatPoints(athlete.totalPoints) }}
               </div>
+              <div class="text-sm text-gray-500">очков</div>
             </div>
           </div>
-          <div class="text-right">
-            <div class="font-medium text-blue-600">
-              {{ formatPoints(athlete.totalPoints) }} очков
+          
+          <!-- Additional Info Row -->
+          <div class="flex items-center justify-between text-sm">
+            <div class="flex items-center space-x-4">
+              <div v-if="athlete.club" class="flex items-center text-gray-600">
+                <UIcon name="i-heroicons-building-office" class="mr-1" size="14" />
+                <span class="truncate">{{ athlete.club }}</span>
+              </div>
+              <div v-if="athlete.ageGroup" class="flex items-center">
+                <span class="inline-flex items-center px-2 py-1 rounded-md text-sm font-medium bg-purple-100 text-purple-700">
+                  {{ athlete.ageGroup }}
+                </span>
+              </div>
             </div>
           </div>
         </div>
-        <div class="mt-2">
-          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-            <UIcon name="i-heroicons-identification" class="mr-1" size="xs" />
-            {{ athlete.id }}
-          </span>
+        
+        <!-- Rankings Footer -->
+        <div class="px-4 py-3 bg-gray-50 border-t border-gray-100 rounded-b-lg">
+          <div class="grid grid-cols-3 gap-2 text-sm">
+            <!-- Absolute Place -->
+            <div :class="[
+              'text-center p-2 rounded',
+              getBestPlaceType(athlete) === 'absolute' ? 'bg-yellow-100 border border-yellow-300' : ''
+            ]">
+              <div class="text-xs text-gray-500 mb-1">Общий</div>
+              <div :class="getBestPlaceType(athlete) === 'absolute' ? 'text-yellow-700 font-bold' : 'text-gray-700'">
+                {{ athlete.absolutePlace || '—' }}
+              </div>
+            </div>
+            
+            <!-- Gender Place -->
+            <div :class="[
+              'text-center p-2 rounded',
+              getBestPlaceType(athlete) === 'gender' ? (athlete.gender === 'Мужской' ? 'bg-blue-100 border border-blue-300' : 'bg-pink-100 border border-pink-300') : ''
+            ]">
+              <div class="text-xs text-gray-500 mb-1">{{ athlete.gender === 'Мужской' ? 'Мужчины' : 'Женщины' }}</div>
+              <div :class="getBestPlaceType(athlete) === 'gender' ? (athlete.gender === 'Мужской' ? 'text-blue-700 font-bold' : 'text-pink-700 font-bold') : 'text-gray-700'">
+                <span v-if="athlete.genderPlace <= 3" class="mr-1">
+                  {{ athlete.genderPlace === 1 ? '🥇' : athlete.genderPlace === 2 ? '🥈' : '🥉' }}
+                </span>
+                {{ athlete.genderPlace || '—' }}
+              </div>
+            </div>
+            
+            <!-- Age Group Place -->
+            <div :class="[
+              'text-center p-2 rounded',
+              getBestPlaceType(athlete) === 'ageGroup' ? 'bg-purple-100 border border-purple-300' : ''
+            ]">
+              <div class="text-xs text-gray-500 mb-1">{{ athlete.ageGroup || 'Возраст' }}</div>
+              <div :class="getBestPlaceType(athlete) === 'ageGroup' ? 'text-purple-700 font-bold' : 'text-gray-700'">
+                <span v-if="athlete.ageGroupPlace <= 3" class="mr-1">
+                  {{ athlete.ageGroupPlace === 1 ? '🥇' : athlete.ageGroupPlace === 2 ? '🥈' : '🥉' }}
+                </span>
+                {{ athlete.ageGroupPlace || '—' }}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -339,5 +403,37 @@ const getTopRanking = (athlete: License): PlaceRanking => {
     color: '',
     alwaysShow: false,
   }
+}
+
+const getBestPlace = (athlete: License): number => {
+  const places = [
+    athlete.absolutePlace,
+    athlete.genderPlace,
+    athlete.ageGroupPlace
+  ].filter(place => place && place > 0)
+  
+  return places.length > 0 ? Math.min(...places) : 999
+}
+
+const getBestPlaceType = (athlete: License): 'absolute' | 'gender' | 'ageGroup' | null => {
+  const places = [
+    { type: 'absolute' as const, place: athlete.absolutePlace },
+    { type: 'gender' as const, place: athlete.genderPlace },
+    { type: 'ageGroup' as const, place: athlete.ageGroupPlace }
+  ].filter(p => p.place && p.place > 0)
+  
+  if (places.length === 0) return null
+  
+  // Find the best (lowest) place
+  const bestPlace = Math.min(...places.map(p => p.place))
+  
+  // If gender and absolute are the same, prefer gender
+  const bestPlaces = places.filter(p => p.place === bestPlace)
+  if (bestPlaces.length > 1) {
+    const genderPlace = bestPlaces.find(p => p.type === 'gender')
+    if (genderPlace) return 'gender'
+  }
+  
+  return bestPlaces[0].type
 }
 </script>
