@@ -8,7 +8,7 @@
             ЛЛТ
           </h1>
           <!-- Visual separator -->
-          <div class="w-24 h-1 bg-gradient-to-r from-blue-500 to-blue-600 mx-auto rounded-full"></div>
+          <div class="w-24 h-1 bg-gradient-to-r from-blue-500 to-blue-600 mx-auto rounded-full" />
         </div>
 
         <!-- Page content -->

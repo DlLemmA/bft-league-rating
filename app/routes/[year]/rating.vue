@@ -1,128 +1,195 @@
 <template>
   <!-- Page Header -->
   <div class="mb-6">
-    <UBreadcrumb :items="[
-      { label: 'Главная', to: '/', icon: 'i-heroicons-home' },
-      { label: `Рейтинг ${year}` }
-    ]" class="mb-4" />
+    <UBreadcrumb
+      :items="[
+        { label: 'Главная', to: '/', icon: 'i-heroicons-home' },
+        { label: `Рейтинг ${year}` },
+      ]"
+      class="mb-4"
+    />
   </div>
 
-    <div v-if="pending" class="text-center py-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
-      <p class="mt-4 text-gray-600">
-        Загрузка рейтинга...
-      </p>
+  <div
+    v-if="pending"
+    class="text-center py-12"
+  >
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
+    <p class="mt-4 text-gray-600">
+      Загрузка рейтинга...
+    </p>
+  </div>
+
+  <div
+    v-else-if="error"
+    class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl shadow-sm mb-8"
+  >
+    <h2 class="font-bold flex items-center">
+      <UIcon
+        name="i-heroicons-exclamation-triangle"
+        class="mr-2"
+      />
+      Ошибка загрузки данных:
+    </h2>
+    <pre class="mt-2 text-sm">{{ error }}</pre>
+  </div>
+
+  <div
+    v-else
+    class="space-y-8"
+  >
+    <!-- Statistics Cards (desktop only) -->
+    <div class="hidden sm:block mb-6">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatisticCard
+          :value="ratingStatistics.total"
+          label="Участников"
+          icon="i-heroicons-users"
+          icon-color="text-blue-600"
+          value-color="text-blue-600"
+        />
+        <StatisticCard
+          :value="ratingStatistics.men"
+          label="Мужчин"
+          icon="i-heroicons-user"
+          icon-color="text-green-600"
+          value-color="text-green-600"
+        />
+        <StatisticCard
+          :value="ratingStatistics.women"
+          label="Женщин"
+          icon="i-heroicons-user"
+          icon-color="text-pink-600"
+          value-color="text-pink-600"
+        />
+        <StatisticCard
+          :value="ratingStatistics.competitions"
+          label="Соревнований"
+          icon="i-heroicons-flag"
+          icon-color="text-purple-600"
+          value-color="text-purple-600"
+        />
+      </div>
     </div>
 
-    <div v-else-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl shadow-sm mb-8">
-      <h2 class="font-bold flex items-center">
-        <UIcon name="i-heroicons-exclamation-triangle" class="mr-2" />
-        Ошибка загрузки данных:
+    <!-- Search and Filters -->
+    <div class="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+      <h2 class="text-lg font-semibold mb-4 flex items-center sm:hidden">
+        <UIcon
+          name="i-heroicons-funnel"
+          class="mr-2 text-blue-600"
+        />
+        Фильтры
       </h2>
-      <pre class="mt-2 text-sm">{{ error }}</pre>
-    </div>
+      <h2 class="hidden sm:flex text-lg font-semibold mb-4 items-center">
+        <UIcon
+          name="i-heroicons-funnel"
+          class="mr-2 text-blue-600"
+        />
+        Фильтры и поиск
+      </h2>
 
-    <div v-else class="space-y-8">
-      <!-- Statistics Cards (desktop only) -->
-      <div class="hidden sm:block mb-6">
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatisticCard 
-            :value="ratingStatistics.total"
-            label="Участников"
-            icon="i-heroicons-users"
-            icon-color="text-blue-600"
-            value-color="text-blue-600"
-          />
-          <StatisticCard 
-            :value="ratingStatistics.men"
-            label="Мужчин"
-            icon="i-heroicons-user"
-            icon-color="text-green-600"
-            value-color="text-green-600"
-          />
-          <StatisticCard 
-            :value="ratingStatistics.women"
-            label="Женщин"
-            icon="i-heroicons-user"
-            icon-color="text-pink-600"
-            value-color="text-pink-600"
-          />
-          <StatisticCard 
-            :value="ratingStatistics.competitions"
-            label="Соревнований"
-            icon="i-heroicons-flag"
-            icon-color="text-purple-600"
-            value-color="text-purple-600"
-          />
-        </div>
+      <!-- Category Tabs -->
+      <div class="mb-4">
+        <UTabs
+          :items="ratingTabs"
+          :default-index="activeTabIndex"
+          @change="handleTabChange"
+        >
+          <template #content="{ item }">
+            <!-- Empty content - we'll render below -->
+          </template>
+        </UTabs>
       </div>
 
-      <!-- Search and Filters -->
-      <div class="bg-white rounded-lg border border-gray-200 p-4 mb-6">
-        <h2 class="text-lg font-semibold mb-4 flex items-center sm:hidden">
-          <UIcon name="i-heroicons-funnel" class="mr-2 text-blue-600" />
-          Фильтры
-        </h2>
-        <h2 class="hidden sm:flex text-lg font-semibold mb-4 items-center">
-          <UIcon name="i-heroicons-funnel" class="mr-2 text-blue-600" />
-          Фильтры и поиск
-        </h2>
-
-        <!-- Category Tabs -->
-        <div class="mb-4">
-          <UTabs :items="ratingTabs" :default-index="activeTabIndex" @change="handleTabChange">
-            <template #content="{ item }">
-              <!-- Empty content - we'll render below -->
-            </template>
-          </UTabs>
+      <div class="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-1 md:grid-cols-3 sm:gap-4">
+        <!-- Search -->
+        <div class="sm:col-span-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+            <UIcon
+              name="i-heroicons-magnifying-glass"
+              class="mr-1"
+              size="16"
+            />
+            Поиск
+          </label>
+          <UInput
+            v-model="searchQuery"
+            type="text"
+            placeholder="Имя спортсмена..."
+            size="md"
+            class="w-full"
+          />
         </div>
 
-        <div class="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-1 md:grid-cols-3 sm:gap-4">
-          <!-- Search -->
-          <div class="sm:col-span-1">
+        <!-- Filters in a row on mobile -->
+        <div class="grid grid-cols-2 gap-3 sm:col-span-2 sm:grid-cols-2 sm:gap-4">
+          <!-- Club filter -->
+          <div>
             <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-              <UIcon name="i-heroicons-magnifying-glass" class="mr-1" size="16" />
-              Поиск
+              <UIcon
+                name="i-heroicons-building-office"
+                class="mr-1"
+                size="16"
+              />
+              Клуб
             </label>
-            <UInput v-model="searchQuery" type="text" placeholder="Имя спортсмена..." size="md" class="w-full" />
+            <USelect
+              v-model="selectedClub"
+              :items="clubOptions"
+              :disabled="availableClubs.length === 0"
+              size="md"
+              class="w-full"
+            />
+            <div
+              v-if="availableClubs.length === 0"
+              class="text-xs text-gray-500 mt-1"
+            >
+              Нет данных
+            </div>
           </div>
 
-          <!-- Filters in a row on mobile -->
-          <div class="grid grid-cols-2 gap-3 sm:col-span-2 sm:grid-cols-2 sm:gap-4">
-            <!-- Club filter -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                <UIcon name="i-heroicons-building-office" class="mr-1" size="16" />
-                Клуб
-              </label>
-              <USelect v-model="selectedClub" :items="clubOptions" :disabled="availableClubs.length === 0"
-                size="md" class="w-full" />
-              <div v-if="availableClubs.length === 0" class="text-xs text-gray-500 mt-1">
-                Нет данных
-              </div>
-            </div>
-
-            <!-- Age group filter -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                <UIcon name="i-heroicons-tag" class="mr-1" size="16" />
-                Возраст
-              </label>
-              <USelect v-model="selectedAgeGroup" :items="ageGroupOptions" :disabled="availableAgeGroups.length === 0"
-                size="md" class="w-full" />
-              <div v-if="availableAgeGroups.length === 0" class="text-xs text-gray-500 mt-1">
-                Нет данных
-              </div>
+          <!-- Age group filter -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+              <UIcon
+                name="i-heroicons-tag"
+                class="mr-1"
+                size="16"
+              />
+              Возраст
+            </label>
+            <USelect
+              v-model="selectedAgeGroup"
+              :items="ageGroupOptions"
+              :disabled="availableAgeGroups.length === 0"
+              size="md"
+              class="w-full"
+            />
+            <div
+              v-if="availableAgeGroups.length === 0"
+              class="text-xs text-gray-500 mt-1"
+            >
+              Нет данных
             </div>
           </div>
         </div>
       </div>
-
-      <RatingTable class="md:bg-white rounded-lg md:shadow-sm" :athletes="getCurrentData()" @show-details="showAthleteDetails" />
-
-      <!-- Rating Details Drawer -->
-      <RatingDetailsDrawer v-if="selectedAthlete" v-model:open="showDetailsDrawer" :athlete="selectedAthlete" />
     </div>
+
+    <RatingTable
+      class="md:bg-white rounded-lg md:shadow-sm"
+      :athletes="getCurrentData()"
+      @show-details="showAthleteDetails"
+    />
+
+    <!-- Rating Details Drawer -->
+    <RatingDetailsDrawer
+      v-if="selectedAthlete"
+      v-model:open="showDetailsDrawer"
+      :athlete="selectedAthlete"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">

@@ -7,71 +7,119 @@
           <tr>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               <div class="flex items-center">
-                <UIcon name="i-heroicons-hashtag" class="mr-1" />
+                <UIcon
+                  name="i-heroicons-hashtag"
+                  class="mr-1"
+                />
                 Место
               </div>
             </th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               <div class="flex items-center">
-                <UIcon name="i-heroicons-user" class="mr-1" />
+                <UIcon
+                  name="i-heroicons-user"
+                  class="mr-1"
+                />
                 Спортсмен
               </div>
             </th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               <div class="flex items-center">
-                <UIcon name="i-heroicons-building-office" class="mr-1" />
+                <UIcon
+                  name="i-heroicons-building-office"
+                  class="mr-1"
+                />
                 Клуб
               </div>
             </th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               <div class="flex items-center">
-                <UIcon name="i-heroicons-tag" class="mr-1" />
+                <UIcon
+                  name="i-heroicons-tag"
+                  class="mr-1"
+                />
                 Категория
               </div>
             </th>
             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
               <div class="flex items-center justify-center">
-                <UIcon name="i-heroicons-clock" class="mr-1" />
+                <UIcon
+                  name="i-heroicons-clock"
+                  class="mr-1"
+                />
                 Время
               </div>
             </th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               <div class="flex items-center">
-                <UIcon name="i-heroicons-star" class="mr-1" />
+                <UIcon
+                  name="i-heroicons-star"
+                  class="mr-1"
+                />
                 Очки
               </div>
             </th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="result in filteredResults" :key="result.nickname" class="hover:bg-gray-50 cursor-pointer"
-            @click="$emit('show-details', result)">
+          <tr
+            v-for="result in filteredResults"
+            :key="result.nickname"
+            class="hover:bg-gray-50 cursor-pointer"
+            @click="$emit('show-details', result)"
+          >
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="flex flex-col space-y-1">
                 <!-- Show places in order of priority -->
-                <div v-for="(ranking, rankingIndex) in getResultRankings(result)" :key="rankingIndex" :class="[
-                  rankingIndex === 0 ? 'text-sm font-medium' : 'text-xs text-gray-600',
-                  ranking.highlighted ? ranking.color : '',
-                ]" class="flex items-center">
-                  <span v-if="ranking.medal" class="mr-1" :class="ranking.medalColor">{{ ranking.medal }}</span>
+                <div
+                  v-for="(ranking, rankingIndex) in getResultRankings(result)"
+                  :key="rankingIndex"
+                  :class="[
+                    rankingIndex === 0 ? 'text-sm font-medium' : 'text-xs text-gray-600',
+                    ranking.highlighted ? ranking.color : '',
+                  ]"
+                  class="flex items-center"
+                >
+                  <span
+                    v-if="ranking.medal"
+                    class="mr-1"
+                    :class="ranking.medalColor"
+                  >{{ ranking.medal }}</span>
                   {{ ranking.value }}
-                  <span v-if="ranking.suffix" class="ml-1" :class="ranking.suffixClass">{{ ranking.suffix }}</span>
+                  <span
+                    v-if="ranking.suffix"
+                    class="ml-1"
+                    :class="ranking.suffixClass"
+                  >{{ ranking.suffix }}</span>
                 </div>
               </div>
             </td>
             <td class="px-6 py-4">
               <div class="flex items-center space-x-3">
-                <UAvatar :src="result.license ? result.license.avatarSrc : null" :alt="result.nickname" size="sm" />
+                <UAvatar
+                  :src="result.license ? result.license.avatarSrc : null"
+                  :alt="result.nickname"
+                  size="sm"
+                />
                 <div class="space-y-1">
                   <div class="text-sm font-medium text-gray-900 flex items-center">
                     {{ result.nickname }}
-                    <span v-if="result.license"
-                      class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                      <UIcon name="i-heroicons-identification" class="mr-1" size="xs" />
+                    <span
+                      v-if="result.license"
+                      class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800"
+                    >
+                      <UIcon
+                        name="i-heroicons-identification"
+                        class="mr-1"
+                        size="xs"
+                      />
                       {{ result.license.id }}
                     </span>
                   </div>
-                  <div v-if="result.birthYear" class="text-xs text-gray-500">
+                  <div
+                    v-if="result.birthYear"
+                    class="text-xs text-gray-500"
+                  >
                     {{ result.birthYear }} г.р.
                   </div>
                 </div>
@@ -85,13 +133,20 @@
               </UTooltip>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <div v-if="result.ageGroup" class="text-sm text-gray-900">
+              <div
+                v-if="result.ageGroup"
+                class="text-sm text-gray-900"
+              >
                 <span
-                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800"
+                >
                   {{ result.ageGroup }}
                 </span>
               </div>
-              <div v-else class="text-sm text-gray-500">
+              <div
+                v-else
+                class="text-sm text-gray-500"
+              >
                 —
               </div>
             </td>
@@ -101,10 +156,16 @@
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <div v-if="result.points" class="text-sm font-medium text-blue-600">
+              <div
+                v-if="result.points"
+                class="text-sm font-medium text-blue-600"
+              >
                 {{ result.points }}
               </div>
-              <div v-else class="text-sm text-gray-500">
+              <div
+                v-else
+                class="text-sm text-gray-500"
+              >
                 —
               </div>
             </td>
@@ -115,50 +176,77 @@
 
     <!-- Mobile Results Cards -->
     <div class="md:hidden space-y-4">
-      <div v-for="result in filteredResults" :key="result.nickname"
+      <div
+        v-for="result in filteredResults"
+        :key="result.nickname"
         class="bg-white rounded-lg shadow p-4 border-l-4 cursor-pointer"
-        :class="result.license ? 'border-blue-500' : 'border-gray-200'" @click="$emit('show-details', result)">
+        :class="result.license ? 'border-blue-500' : 'border-gray-200'"
+        @click="$emit('show-details', result)"
+      >
         <div class="flex justify-between items-start mb-3">
           <div class="flex items-center">
             <!-- Badge with highest achievement -->
-            <div :class="[
-              'rounded-full h-8 w-8 flex items-center justify-center mr-2',
-              getTopRanking(result) && getTopRanking(result).badgeClass ? getTopRanking(result).badgeClass : 'bg-gray-100',
-            ]">
-              <span v-if="getTopRanking(result) && getTopRanking(result).medal"
+            <div
+              :class="[
+                'rounded-full h-8 w-8 flex items-center justify-center mr-2',
+                getTopRanking(result) && getTopRanking(result).badgeClass ? getTopRanking(result).badgeClass : 'bg-gray-100',
+              ]"
+            >
+              <span
+                v-if="getTopRanking(result) && getTopRanking(result).medal"
                 :class="getTopRanking(result) && getTopRanking(result).medalColor ? getTopRanking(result).medalColor : ''"
-                class="font-bold">
+                class="font-bold"
+              >
                 {{ getTopRanking(result).medal }}
               </span>
-              <span v-else class="text-sm font-medium">{{ result && result.absolutePlace ? result.absolutePlace : ''
-                }}</span>
+              <span
+                v-else
+                class="text-sm font-medium"
+              >{{ result && result.absolutePlace ? result.absolutePlace : ''
+              }}</span>
             </div>
             <div>
               <div class="flex items-center space-x-3">
-                <UAvatar :src="result.license ? result.license.avatarSrc : null" :alt="result.nickname" size="sm" />
+                <UAvatar
+                  :src="result.license ? result.license.avatarSrc : null"
+                  :alt="result.nickname"
+                  size="sm"
+                />
                 <div>
                   <div class="font-medium">
                     {{ result.nickname }}
                   </div>
-                  <div v-if="result.birthYear" class="text-xs text-gray-500">
+                  <div
+                    v-if="result.birthYear"
+                    class="text-xs text-gray-500"
+                  >
                     {{ result.birthYear }} г.р.
                   </div>
                 </div>
               </div>
               <div class="text-xs text-gray-500 flex flex-wrap items-center gap-1 mt-1">
                 <span v-if="result.club">{{ result.club }}</span>
-                <span v-if="result.club && result.ageGroup" class="mx-1">•</span>
-                <span v-if="result.ageGroup"
-                  class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                <span
+                  v-if="result.club && result.ageGroup"
+                  class="mx-1"
+                >•</span>
+                <span
+                  v-if="result.ageGroup"
+                  class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800"
+                >
                   {{ result.ageGroup }}
                 </span>
 
                 <!-- Show positions with priority -->
-                <span v-for="(ranking, rankingIndex) in getResultRankings(result)"
-                  v-if="rankingIndex === 0 || (ranking && ranking.alwaysShow)" :key="rankingIndex" :class="[
+                <span
+                  v-for="(ranking, rankingIndex) in getResultRankings(result)"
+                  v-if="rankingIndex === 0 || (ranking && ranking.alwaysShow)"
+                  :key="rankingIndex"
+                  :class="[
                     'ml-1 px-1.5 py-0.5 rounded text-xs',
                     ranking && ranking.badgeClass ? ranking.badgeClass : '',
-                  ]">
+                  ]"
+                >
                   {{ ranking ? ranking.mobileLabel : '' }}
                   <span v-if="ranking && ranking.medal">{{ ranking.medal }}</span>
                 </span>
@@ -169,11 +257,21 @@
             <div class="font-medium">
               {{ result.totalTime }}
             </div>
-            <div v-if="result.points" class="text-xs text-blue-600">
+            <div
+              v-if="result.points"
+              class="text-xs text-blue-600"
+            >
               {{ result.points }} очков
             </div>
-            <div v-if="result.license" class="text-xs text-blue-600">
-              <UIcon name="i-heroicons-identification" class="mr-1" size="xs" />
+            <div
+              v-if="result.license"
+              class="text-xs text-blue-600"
+            >
+              <UIcon
+                name="i-heroicons-identification"
+                class="mr-1"
+                size="xs"
+              />
               {{ result.license.id }}
             </div>
           </div>

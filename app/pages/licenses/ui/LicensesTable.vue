@@ -1,6 +1,5 @@
 <template>
   <div class="space-y-4">
-
     <!-- Desktop Table -->
     <div class="hidden md:block overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
@@ -134,7 +133,6 @@
         :license="license"
       />
     </div>
-
   </div>
 </template>
 

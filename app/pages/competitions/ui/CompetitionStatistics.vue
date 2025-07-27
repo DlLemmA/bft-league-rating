@@ -1,7 +1,10 @@
 <template>
   <div class="space-y-4">
     <h3 class="text-xl font-bold flex items-center">
-      <UIcon name="i-heroicons-chart-bar" class="mr-2 text-blue-600" />
+      <UIcon
+        name="i-heroicons-chart-bar"
+        class="mr-2 text-blue-600"
+      />
       Подробная статистика
     </h3>
 
@@ -9,7 +12,10 @@
       <!-- Time Statistics -->
       <div class="bg-white rounded-lg shadow p-6">
         <h4 class="text-lg font-semibold mb-4 flex items-center">
-          <UIcon name="i-heroicons-clock" class="mr-2 text-blue-600" />
+          <UIcon
+            name="i-heroicons-clock"
+            class="mr-2 text-blue-600"
+          />
           Общая статистика по времени
         </h4>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -18,7 +24,10 @@
               Лучшее время
             </div>
             <div class="font-medium text-lg flex items-center">
-              <UIcon name="i-heroicons-trophy" class="mr-2 text-amber-500" />
+              <UIcon
+                name="i-heroicons-trophy"
+                class="mr-2 text-amber-500"
+              />
               {{ bestTime }}
             </div>
           </div>
@@ -72,7 +81,7 @@ const bestTime = computed((): string => {
 
   const bestResult = props.results.reduce((best, current) =>
     (current.totalTimeSeconds < best.totalTimeSeconds) ? current : best,
-    props.results[0],
+  props.results[0],
   )
 
   return bestResult.totalTime || '—'

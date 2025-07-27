@@ -303,7 +303,7 @@ function calculatePlaces(athletes: License[], competitions: any[]): License[] {
   const athletesWithPreviousPlaces = assignCurrentPlaces(athletesWithPreviousPoints)
 
   // Store previous places
-  athletesWithPreviousPlaces.forEach(athlete => {
+  athletesWithPreviousPlaces.forEach((athlete) => {
     athlete.previousAbsolutePlace = athlete.absolutePlace
     athlete.previousGenderPlace = athlete.genderPlace
     athlete.previousAgeGroupPlace = athlete.ageGroupPlace
@@ -313,7 +313,7 @@ function calculatePlaces(athletes: License[], competitions: any[]): License[] {
   const athletesWithCurrentPlaces = assignCurrentPlaces(athletes)
 
   // Merge previous places into current athletes
-  athletesWithCurrentPlaces.forEach(athlete => {
+  athletesWithCurrentPlaces.forEach((athlete) => {
     const previousAthlete = athletesWithPreviousPlaces.find(prev => prev.id === athlete.id)
     if (previousAthlete) {
       athlete.previousAbsolutePlace = previousAthlete.previousAbsolutePlace
@@ -329,33 +329,34 @@ function calculatePlaces(athletes: License[], competitions: any[]): License[] {
  * Calculate points for athletes excluding the latest competition
  */
 function calculatePreviousPoints(athletes: License[], previousCompetitions: any[]): License[] {
-  return athletes.map(athlete => {
+  return athletes.map((athlete) => {
     const previousAthlete = { ...athlete }
-    
+
     // Filter competitions to only include previous ones
     if (previousAthlete.competitions) {
       const previousCompetitionSlugs = new Set()
-      
-      previousCompetitions.forEach(comp => {
+
+      previousCompetitions.forEach((comp) => {
         if (Array.isArray(comp.events)) {
           comp.events.forEach((event: any) => {
             previousCompetitionSlugs.add(`${comp.slug}-${event.slug}`)
           })
-        } else {
+        }
+        else {
           previousCompetitionSlugs.add(comp.slug)
         }
       })
 
       // Keep only competitions that are in the previous competitions list
-      previousAthlete.competitions = previousAthlete.competitions.filter(comp => 
-        previousCompetitionSlugs.has(comp.competition)
+      previousAthlete.competitions = previousAthlete.competitions.filter(comp =>
+        previousCompetitionSlugs.has(comp.competition),
       )
 
       // Recalculate total points with previous competitions only
       const eventsPoints: EventPoints[] = previousAthlete.competitions.map(comp => ({
         eventName: comp.competition,
         eventCategory: comp.category,
-        points: comp.points
+        points: comp.points,
       }))
 
       const calculatedPoints = calculateTotalPoints(eventsPoints)

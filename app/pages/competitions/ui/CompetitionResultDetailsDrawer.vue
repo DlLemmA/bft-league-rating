@@ -3,7 +3,10 @@
     <template #header>
       <div class="flex justify-between items-start">
         <h2 class="text-xl font-bold flex items-center">
-          <UIcon name="i-heroicons-trophy" class="mr-2 text-blue-600" />
+          <UIcon
+            name="i-heroicons-trophy"
+            class="mr-2 text-blue-600"
+          />
           Детали результата
         </h2>
       </div>
@@ -11,32 +14,64 @@
     <template #body>
       <div class="mb-6">
         <div class="flex items-center space-x-3 mb-4">
-          <UAvatar :src="result.license ? result.license.avatarSrc : null" :alt="result.nickname" size="lg" />
+          <UAvatar
+            :src="result.license ? result.license.avatarSrc : null"
+            :alt="result.nickname"
+            size="lg"
+          />
           <div>
             <div class="text-lg font-medium">
               {{ result.nickname }}
             </div>
-            <div v-if="result.birthYear" class="text-sm text-gray-500">
+            <div
+              v-if="result.birthYear"
+              class="text-sm text-gray-500"
+            >
               {{ result.birthYear }} г.р.
             </div>
             <div class="flex flex-wrap items-center gap-2 mt-1">
-              <span v-if="result.license"
-                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                <UIcon name="i-heroicons-identification" class="mr-1" size="xs" />
+              <span
+                v-if="result.license"
+                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800"
+              >
+                <UIcon
+                  name="i-heroicons-identification"
+                  class="mr-1"
+                  size="xs"
+                />
                 {{ result.license.id }}
               </span>
-              <span v-if="result.gender" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
-                :class="result.gender === 'male' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800'">
-                <UIcon name="i-heroicons-user" class="mr-1" size="xs" />
+              <span
+                v-if="result.gender"
+                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                :class="result.gender === 'male' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800'"
+              >
+                <UIcon
+                  name="i-heroicons-user"
+                  class="mr-1"
+                  size="xs"
+                />
                 {{ result.gender === 'male' ? 'Мужчина' : 'Женщина' }}
               </span>
-              <span v-if="result.ageGroup"
-                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
-                <UIcon name="i-heroicons-tag" class="mr-1" size="xs" />
+              <span
+                v-if="result.ageGroup"
+                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800"
+              >
+                <UIcon
+                  name="i-heroicons-tag"
+                  class="mr-1"
+                  size="xs"
+                />
                 {{ result.ageGroup }}
-                <span v-if="result.ageGroupPlace" class="ml-1 font-bold">({{ result.ageGroupPlace }} место)</span>
+                <span
+                  v-if="result.ageGroupPlace"
+                  class="ml-1 font-bold"
+                >({{ result.ageGroupPlace }} место)</span>
               </span>
-              <span v-if="result.club" class="text-sm text-gray-600">{{ result.club }}</span>
+              <span
+                v-if="result.club"
+                class="text-sm text-gray-600"
+              >{{ result.club }}</span>
             </div>
           </div>
         </div>
@@ -47,21 +82,36 @@
             <span>{{ result.totalTime }}</span>
           </div>
           <div class="flex flex-wrap gap-2">
-            <div v-if="result.absolutePlace" class="text-sm flex items-center">
+            <div
+              v-if="result.absolutePlace"
+              class="text-sm flex items-center"
+            >
               <span class="font-medium">{{ result.absolutePlace }}</span>
               <span class="text-gray-600 ml-1">место в абсолюте</span>
-              <span v-if="result.absolutePlace <= 3" class="ml-1">
+              <span
+                v-if="result.absolutePlace <= 3"
+                class="ml-1"
+              >
                 {{ result.absolutePlace === 1 ? '🥇' : result.absolutePlace === 2 ? '🥈' : '🥉' }}
               </span>
             </div>
-            <div v-if="result.genderAbsolutePlace" class="text-sm flex items-center">
+            <div
+              v-if="result.genderAbsolutePlace"
+              class="text-sm flex items-center"
+            >
               <span class="font-medium">{{ result.genderAbsolutePlace }}</span>
               <span class="text-gray-600 ml-1">место среди {{ result.gender === 'male' ? 'мужчин' : 'женщин' }}</span>
-              <span v-if="result.genderAbsolutePlace <= 3" class="ml-1">
+              <span
+                v-if="result.genderAbsolutePlace <= 3"
+                class="ml-1"
+              >
                 {{ result.genderAbsolutePlace === 1 ? '🥇' : result.genderAbsolutePlace === 2 ? '🥈' : '🥉' }}
               </span>
             </div>
-            <div v-if="result.points" class="text-sm flex items-center">
+            <div
+              v-if="result.points"
+              class="text-sm flex items-center"
+            >
               <span class="font-medium text-blue-600">{{ result.points }}</span>
               <span class="text-gray-600 ml-1">очков</span>
             </div>
@@ -69,14 +119,26 @@
         </div>
 
         <!-- Points Summary Section -->
-        <div v-if="result.points && result.hasLicense" class="bg-amber-50 rounded-lg p-4 mb-6 border border-amber-200">
+        <div
+          v-if="result.points && result.hasLicense"
+          class="bg-amber-50 rounded-lg p-4 mb-6 border border-amber-200"
+        >
           <div class="flex items-center justify-between mb-3">
             <h3 class="font-bold text-lg flex items-center">
-              <UIcon name="i-heroicons-calculator" class="mr-2 text-amber-600" />
+              <UIcon
+                name="i-heroicons-calculator"
+                class="mr-2 text-amber-600"
+              />
               Расчет очков
             </h3>
-            <NuxtLink :to="calculatorLink" class="text-xs text-blue-600 hover:text-blue-800 flex items-center">
-              <UIcon name="i-heroicons-calculator" class="w-3 h-3 mr-1" />
+            <NuxtLink
+              :to="calculatorLink"
+              class="text-xs text-blue-600 hover:text-blue-800 flex items-center"
+            >
+              <UIcon
+                name="i-heroicons-calculator"
+                class="w-3 h-3 mr-1"
+              />
               Показать подробный расчет
             </NuxtLink>
           </div>
@@ -96,23 +158,35 @@
         </div>
 
         <!-- Stage Results -->
-        <div v-if="result.stages && result.stages.length > 0" class="space-y-4">
+        <div
+          v-if="result.stages && result.stages.length > 0"
+          class="space-y-4"
+        >
           <div class="bg-gray-50 rounded-md p-4 border border-gray-200">
             <h3 class="font-bold text-lg mb-3 flex items-center">
-              <UIcon name="i-heroicons-clock" class="mr-2 text-blue-600" />
+              <UIcon
+                name="i-heroicons-clock"
+                class="mr-2 text-blue-600"
+              />
               Результаты по этапам:
             </h3>
 
             <div class="space-y-3">
-              <div v-for="(stage, index) in result.stages" :key="index"
-                class="flex justify-between items-center p-3 bg-white rounded border">
+              <div
+                v-for="(stage, index) in result.stages"
+                :key="index"
+                class="flex justify-between items-center p-3 bg-white rounded border"
+              >
                 <div class="flex items-center">
                   <span class="mr-3 text-lg">{{ getStageEmoji(stage.type) }}</span>
                   <div>
                     <div class="font-medium">
                       {{ translateStageType(stage.type) }}
                     </div>
-                    <div v-if="stage.place" class="text-xs text-gray-500">
+                    <div
+                      v-if="stage.place"
+                      class="text-xs text-gray-500"
+                    >
                       {{ stage.place }} место
                     </div>
                   </div>
@@ -121,7 +195,10 @@
                   <div class="font-bold text-lg">
                     {{ stage.time }}
                   </div>
-                  <div v-if="stage.pace" class="text-xs text-gray-500">
+                  <div
+                    v-if="stage.pace"
+                    class="text-xs text-gray-500"
+                  >
                     {{ stage.pace }}
                   </div>
                 </div>
@@ -130,32 +207,50 @@
           </div>
 
           <!-- Stage Statistics -->
-          <div v-if="hasStageStatistics" class="bg-gray-50 rounded-md p-4 border border-gray-200">
+          <div
+            v-if="hasStageStatistics"
+            class="bg-gray-50 rounded-md p-4 border border-gray-200"
+          >
             <h3 class="font-bold text-lg mb-3 flex items-center">
-              <UIcon name="i-heroicons-chart-bar" class="mr-2 text-green-600" />
+              <UIcon
+                name="i-heroicons-chart-bar"
+                class="mr-2 text-green-600"
+              />
               Статистика по этапам:
             </h3>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div v-if="bestStage" class="p-3 bg-green-50 rounded border border-green-200">
+              <div
+                v-if="bestStage"
+                class="p-3 bg-green-50 rounded border border-green-200"
+              >
                 <div class="text-sm text-green-700 font-medium">
                   Лучший этап
                 </div>
                 <div class="flex items-center mt-1">
                   <span class="mr-2">{{ getStageEmoji(bestStage.type) }}</span>
                   <span class="font-bold">{{ translateStageType(bestStage.type) }}</span>
-                  <span v-if="bestStage.place" class="ml-2 text-sm">({{ bestStage.place }} место)</span>
+                  <span
+                    v-if="bestStage.place"
+                    class="ml-2 text-sm"
+                  >({{ bestStage.place }} место)</span>
                 </div>
               </div>
 
-              <div v-if="worstStage" class="p-3 bg-red-50 rounded border border-red-200">
+              <div
+                v-if="worstStage"
+                class="p-3 bg-red-50 rounded border border-red-200"
+              >
                 <div class="text-sm text-red-700 font-medium">
                   Слабый этап
                 </div>
                 <div class="flex items-center mt-1">
                   <span class="mr-2">{{ getStageEmoji(worstStage.type) }}</span>
                   <span class="font-bold">{{ translateStageType(worstStage.type) }}</span>
-                  <span v-if="worstStage.place" class="ml-2 text-sm">({{ worstStage.place }} место)</span>
+                  <span
+                    v-if="worstStage.place"
+                    class="ml-2 text-sm"
+                  >({{ worstStage.place }} место)</span>
                 </div>
               </div>
             </div>
@@ -163,8 +258,15 @@
         </div>
 
         <!-- No stages message -->
-        <div v-else class="bg-gray-50 rounded-md p-4 border border-gray-200 text-center">
-          <UIcon name="i-heroicons-information-circle" class="mx-auto mb-2 text-gray-400" size="xl" />
+        <div
+          v-else
+          class="bg-gray-50 rounded-md p-4 border border-gray-200 text-center"
+        >
+          <UIcon
+            name="i-heroicons-information-circle"
+            class="mx-auto mb-2 text-gray-400"
+            size="xl"
+          />
           <p class="text-gray-600">
             Детальная информация по этапам недоступна
           </p>

@@ -1,4 +1,4 @@
-import competitionPoints from "./[year]/competition-points"
+import competitionPoints from './[year]/competition-points'
 
 // Extract competition metadata from result stem
 const extractCompetitionMetaFromStem = (stem: string): { year: string, slug: string } => {
@@ -77,8 +77,8 @@ export default defineEventHandler(async (event) => {
         const stats = calculateGenderStatistics(eventResults)
         const hasResults = eventResults.length > 0
 
-        const pointsInfo = competitionsPointsData.find(competitionPointData => {
-          return competitionPointData.stem.includes(competitionYear);
+        const pointsInfo = competitionsPointsData.find((competitionPointData) => {
+          return competitionPointData.stem.includes(competitionYear)
         })
 
         return {
@@ -114,8 +114,8 @@ export default defineEventHandler(async (event) => {
     const statistics = calculateGenderStatistics(competitionResults)
     const hasResults = competitionResults.length > 0
 
-    const pointsInfo = competitionsPointsData.find(competitionPointData => {
-      return competitionPointData.stem.includes(competitionYear);
+    const pointsInfo = competitionsPointsData.find((competitionPointData) => {
+      return competitionPointData.stem.includes(competitionYear)
     })
 
     return {

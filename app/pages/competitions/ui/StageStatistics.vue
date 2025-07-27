@@ -2,19 +2,35 @@
   <div class="bg-white rounded-lg shadow">
     <div class="border-b border-gray-100 px-6 py-4">
       <h4 class="text-lg font-semibold flex items-center">
-        <UIcon name="i-heroicons-chart-bar-square" class="mr-2 text-blue-600" />
+        <UIcon
+          name="i-heroicons-chart-bar-square"
+          class="mr-2 text-blue-600"
+        />
         Статистика по этапам
       </h4>
     </div>
 
-    <div v-if="!hasStages" class="text-center text-gray-500 py-12">
-      <UIcon name="i-heroicons-exclamation-circle" class="mx-auto mb-3" size="xl" />
+    <div
+      v-if="!hasStages"
+      class="text-center text-gray-500 py-12"
+    >
+      <UIcon
+        name="i-heroicons-exclamation-circle"
+        class="mx-auto mb-3"
+        size="xl"
+      />
       <p>Нет данных по этапам</p>
     </div>
 
-    <div v-else class="p-6 space-y-8">
-      <div v-for="(stats, stageType) in stageStats" :key="stageType"
-        class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+    <div
+      v-else
+      class="p-6 space-y-8"
+    >
+      <div
+        v-for="(stats, stageType) in stageStats"
+        :key="stageType"
+        class="bg-gray-50 rounded-lg p-4 border border-gray-100"
+      >
         <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
           <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3 text-xl">
             {{ getStageEmoji(stageType) }}
@@ -27,20 +43,29 @@
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-50">
             <div class="text-sm text-gray-500 mb-2 flex items-center">
-              <UIcon name="i-heroicons-trophy" class="mr-2 text-amber-500" />
+              <UIcon
+                name="i-heroicons-trophy"
+                class="mr-2 text-amber-500"
+              />
               Лучшее время
             </div>
             <div class="font-bold text-lg text-blue-700">
               {{ stats.best }}
             </div>
-            <div v-if="stats.bestAthlete" class="text-xs text-gray-500 mt-1 truncate">
+            <div
+              v-if="stats.bestAthlete"
+              class="text-xs text-gray-500 mt-1 truncate"
+            >
               {{ stats.bestAthlete }}
             </div>
           </div>
 
           <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-50">
             <div class="text-sm text-gray-500 mb-2 flex items-center">
-              <UIcon name="i-heroicons-calculator" class="mr-2 text-gray-400" />
+              <UIcon
+                name="i-heroicons-calculator"
+                class="mr-2 text-gray-400"
+              />
               Среднее время
             </div>
             <div class="font-bold text-lg">
@@ -50,7 +75,10 @@
 
           <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-50">
             <div class="text-sm text-gray-500 mb-2 flex items-center">
-              <UIcon name="i-heroicons-arrow-trending-up" class="mr-2 text-gray-400" />
+              <UIcon
+                name="i-heroicons-arrow-trending-up"
+                class="mr-2 text-gray-400"
+              />
               Медианное время
             </div>
             <div class="font-bold text-lg">
