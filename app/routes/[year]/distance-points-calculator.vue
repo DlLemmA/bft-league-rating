@@ -1,64 +1,140 @@
 <template>
   <div class="container mx-auto px-4 py-8">
     <div class="mb-8">
-      <UBreadcrumb :items="breadcrumbLinks" class="mb-4" />
+      <UBreadcrumb
+        :items="breadcrumbLinks"
+        class="mb-4"
+      />
       <h1 class="text-4xl font-bold mb-2">
         <span class="hidden sm:inline">Калькулятор очков за дистанцию</span>
         <span class="sm:hidden">Калькулятор очков</span>
       </h1>
 
       <!-- Pre-filled data indicator -->
-      <div v-if="isPreFilled" class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+      <div
+        v-if="isPreFilled"
+        class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg"
+      >
         <div class="flex items-center text-sm text-blue-800">
-          <UIcon name="i-heroicons-information-circle" class="w-4 h-4 mr-2" />
+          <UIcon
+            name="i-heroicons-information-circle"
+            class="w-4 h-4 mr-2"
+          />
           Данные автоматически заполнены из результатов соревнования
         </div>
       </div>
     </div>
 
     <div class="bg-white rounded-lg shadow-md p-6">
-      <form id="calculator-form" class="space-y-6" @submit.prevent>
+      <form
+        id="calculator-form"
+        class="space-y-6"
+        @submit.prevent
+      >
         <div class="form-group">
-          <label for="event-type" class="block text-sm font-medium text-gray-700 mb-1">Дистанция:</label>
-          <USelect v-model="selectedEvent" :options="eventOptions" placeholder="Выберите дистанцию" size="md" class="w-full" />
+          <label
+            for="event-type"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >Дистанция:</label>
+          <USelect
+            v-model="selectedEvent"
+            :options="eventOptions"
+            placeholder="Выберите дистанцию"
+            size="md"
+            class="w-full"
+          />
         </div>
 
         <div class="form-group">
-          <label for="time1-hours" class="block text-sm font-medium text-gray-700 mb-1">Время победителя:</label>
+          <label
+            for="time1-hours"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >Время победителя:</label>
           <div class="flex items-center space-x-2">
-            <input id="time1-hours" v-model="winnerTime.hours" type="number" placeholder="часы" min="0" max="23"
-              class="w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            <input
+              id="time1-hours"
+              v-model="winnerTime.hours"
+              type="number"
+              placeholder="часы"
+              min="0"
+              max="23"
+              class="w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            >
             <span>час(ов),</span>
-            <input id="time1-minutes" v-model="winnerTime.minutes" type="number" placeholder="мин." min="0" max="59"
-              class="w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            <input
+              id="time1-minutes"
+              v-model="winnerTime.minutes"
+              type="number"
+              placeholder="мин."
+              min="0"
+              max="59"
+              class="w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            >
             <span>мин.,</span>
-            <input id="time1-seconds" v-model="winnerTime.seconds" type="number" placeholder="сек." min="0" max="59"
-              class="w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            <input
+              id="time1-seconds"
+              v-model="winnerTime.seconds"
+              type="number"
+              placeholder="сек."
+              min="0"
+              max="59"
+              class="w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            >
             <span>сек.</span>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="time2-hours" class="block text-sm font-medium text-gray-700 mb-1">Ваше время:</label>
+          <label
+            for="time2-hours"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >Ваше время:</label>
           <div class="flex items-center space-x-2">
-            <input id="time2-hours" v-model="yourTime.hours" type="number" placeholder="часы" min="0" max="23"
-              class="w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            <input
+              id="time2-hours"
+              v-model="yourTime.hours"
+              type="number"
+              placeholder="часы"
+              min="0"
+              max="23"
+              class="w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            >
             <span>час(ов),</span>
-            <input id="time2-minutes" v-model="yourTime.minutes" type="number" placeholder="мин." min="0" max="59"
-              class="w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            <input
+              id="time2-minutes"
+              v-model="yourTime.minutes"
+              type="number"
+              placeholder="мин."
+              min="0"
+              max="59"
+              class="w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            >
             <span>мин.,</span>
-            <input id="time2-seconds" v-model="yourTime.seconds" type="number" placeholder="сек." min="0" max="59"
-              class="w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            <input
+              id="time2-seconds"
+              v-model="yourTime.seconds"
+              type="number"
+              placeholder="сек."
+              min="0"
+              max="59"
+              class="w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            >
             <span>сек.</span>
           </div>
         </div>
 
         <div class="form-group">
           <label class="block text-sm font-medium text-gray-700 mb-1">Результат расчета:</label>
-          <div v-if="resultError" class="p-4 bg-red-50 rounded-md border border-red-200 text-red-600">
+          <div
+            v-if="resultError"
+            class="p-4 bg-red-50 rounded-md border border-red-200 text-red-600"
+          >
             {{ resultMessage }}
           </div>
-          <div v-else class="space-y-4">
+          <div
+            v-else
+            class="space-y-4"
+          >
             <!-- Quick result - more prominent -->
             <div class="p-6 bg-amber-50 rounded-lg border border-amber-200 shadow-sm">
               <div class="text-center">
@@ -72,7 +148,10 @@
                   {{ currentBasePoints }} × {{ coefficient.toFixed(3) }}
                 </div>
                 <div class="text-sm text-gray-600 mt-3 flex items-center justify-center">
-                  <UIcon name="i-heroicons-clock" class="w-4 h-4 mr-1" />
+                  <UIcon
+                    name="i-heroicons-clock"
+                    class="w-4 h-4 mr-1"
+                  />
                   Отставание от победителя: {{ timeDifferenceFormatted }}
                 </div>
               </div>
@@ -143,14 +222,24 @@
 
       <!-- Collapsible Formula Image Section -->
       <div class="mt-6 border-t border-gray-200 pt-6">
-        <UButton variant="ghost" color="gray" size="sm" class="w-full justify-between"
-          @click="showFormula = !showFormula">
+        <UButton
+          variant="ghost"
+          color="gray"
+          size="sm"
+          class="w-full justify-between"
+          @click="showFormula = !showFormula"
+        >
           <span class="flex items-center">
-            <UIcon name="i-heroicons-document-text" class="w-4 h-4 mr-2" />
+            <UIcon
+              name="i-heroicons-document-text"
+              class="w-4 h-4 mr-2"
+            />
             {{ showFormula ? 'Скрыть формулу из Положения' : 'Показать формулу из Положения' }}
           </span>
-          <UIcon :name="showFormula ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
-            class="transition-transform duration-200" />
+          <UIcon
+            :name="showFormula ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+            class="transition-transform duration-200"
+          />
         </UButton>
 
         <UCollapsible v-model:open="showFormula">
@@ -159,12 +248,22 @@
               <div class="text-sm text-gray-700 mb-3">
                 Пункт 14.7 Положения о Любительской Лиге триатлона:
               </div>
-              <img src="/img/distance_points_formula.jpeg" alt="Пункт 14.7 Положения о Любительской Лиге триатлона"
-                class="w-full h-auto rounded border border-gray-300">
+              <img
+                src="/img/distance_points_formula.jpeg"
+                alt="Пункт 14.7 Положения о Любительской Лиге триатлона"
+                class="w-full h-auto rounded border border-gray-300"
+              >
               <div class="mt-3 text-xs text-gray-500">
-                <a href="https://triatlon.by/assets/images/files/2025/polozhenie-lyubitelskaya-liga-triatlona-2025.pdf"
-                  target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline flex items-center">
-                  <UIcon name="i-heroicons-arrow-top-right-on-square" class="w-3 h-3 mr-1" />
+                <a
+                  href="https://triatlon.by/assets/images/files/2025/polozhenie-lyubitelskaya-liga-triatlona-2025.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-blue-600 hover:underline flex items-center"
+                >
+                  <UIcon
+                    name="i-heroicons-arrow-top-right-on-square"
+                    class="w-3 h-3 mr-1"
+                  />
                   Открыть полное Положение
                 </a>
               </div>
@@ -187,12 +286,12 @@ const breadcrumbLinks = [
   {
     label: 'Главная',
     to: '/',
-    icon: 'i-heroicons-home'
+    icon: 'i-heroicons-home',
   },
   {
     label: 'Калькулятор очков за дистанцию',
-    icon: 'i-heroicons-calculator'
-  }
+    icon: 'i-heroicons-calculator',
+  },
 ]
 
 // Page metadata - mobile optimized title
@@ -211,7 +310,7 @@ const predefinedTimes = computed(() => {
   const times: Record<string, { hours: number, minutes: number, seconds: number }> = {}
   const categories = competitionPointsData.value?.body?.categories
   if (categories) {
-    Object.entries(categories).forEach(([key, category]: [string, any]) => {
+    Object.entries(categories).forEach(([_key, category]: [string, any]) => {
       times[category.name] = category.defaultWinnerTime
     })
   }
@@ -222,7 +321,7 @@ const basePoints = computed(() => {
   const points: Record<string, number> = {}
   const categories = competitionPointsData.value?.body?.categories
   if (categories) {
-    Object.entries(categories).forEach(([key, category]: [string, any]) => {
+    Object.entries(categories).forEach(([_key, category]: [string, any]) => {
       points[category.name] = category.basePoints
     })
   }
@@ -237,10 +336,10 @@ const eventDescriptions = computed(() => {
 const eventOptions = computed(() => {
   const categories = competitionPointsData.value?.body?.categories
   if (!categories) return []
-  
+
   return Object.entries(categories).map(([key, category]: [string, any]) => ({
     label: `${category.name} ${eventDescriptions.value[key] || ''}`.trim(),
-    value: category.name
+    value: category.name,
   }))
 })
 
@@ -387,8 +486,8 @@ watch([selectedEvent, winnerTime, yourTime], () => {
   if ((urlParams.winnerTime || urlParams.yourTime || urlParams.basePoints) && !userHasModifiedData.value) {
     const hasChanged
       = selectedEvent.value !== initialValues.value.selectedEvent
-      || JSON.stringify(winnerTime.value) !== JSON.stringify(initialValues.value.winnerTime)
-      || JSON.stringify(yourTime.value) !== JSON.stringify(initialValues.value.yourTime)
+        || JSON.stringify(winnerTime.value) !== JSON.stringify(initialValues.value.winnerTime)
+        || JSON.stringify(yourTime.value) !== JSON.stringify(initialValues.value.yourTime)
 
     if (hasChanged) {
       userHasModifiedData.value = true

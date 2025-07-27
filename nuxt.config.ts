@@ -1,7 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
-  devtools: { enabled: true },
 
   modules: [
     '@nuxt/content',
@@ -9,6 +7,14 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@nuxt/image',
   ],
+
+  components: [
+    {
+      path: '~/pages',
+      pathPrefix: false,
+    },
+  ],
+  devtools: { enabled: true },
 
   css: ['~/assets/css/main.css'],
 
@@ -20,6 +26,11 @@ export default defineNuxtConfig({
       },
     },
   },
+
+  dir: {
+    pages: 'routes',
+  },
+  compatibilityDate: '2025-07-15',
 
   eslint: {
     config: {

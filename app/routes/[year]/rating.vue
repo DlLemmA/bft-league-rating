@@ -1,13 +1,10 @@
 <template>
   <div class="container mx-auto px-4 py-8">
     <div class="mb-8">
-      <UBreadcrumb 
-        :items="[
-          { label: 'Главная', to: '/', icon: 'i-heroicons-home' },
-          { label: `Рейтинг ${year}` }
-        ]" 
-        class="mb-4"
-      />
+      <UBreadcrumb :items="[
+        { label: 'Главная', to: '/', icon: 'i-heroicons-home' },
+        { label: `Рейтинг ${year}` }
+      ]" class="mb-4" />
       <h1 class="text-4xl font-bold mb-2 flex items-center">
         <UIcon name="i-heroicons-trophy" class="mr-3 text-blue-600" size="lg" />
         Рейтинг спортсменов {{ year }}
@@ -127,17 +124,13 @@
         </template>
       </UTabs>
 
-      <!-- Competition Details Drawer -->
-      <CompetitionDetailsDrawer v-model:open="showDetailsDrawer" :athlete="selectedAthlete" />
+      <!-- Rating Details Drawer -->
+      <RatingDetailsDrawer v-model:open="showDetailsDrawer" :athlete="selectedAthlete" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import RatingTable from '~/components/RatingTable.vue'
-import RatingStatisticsCards from '~/components/RatingStatisticsCards.vue'
-import CompetitionDetailsDrawer from '~/components/CompetitionDetailsDrawer.vue'
-
 const route = useRoute()
 const year = route.params.year as string
 

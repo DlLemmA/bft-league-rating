@@ -2,8 +2,11 @@
   <div class="container mx-auto px-4 py-8">
     <div class="mb-8">
       <!-- Breadcrumb navigation -->
-      <UBreadcrumb class="mb-4" :items="breadcrumbLinks" />
-      
+      <UBreadcrumb
+        class="mb-4"
+        :items="breadcrumbLinks"
+      />
+
       <!-- Page title with mobile optimization -->
       <h1 class="text-4xl md:text-4xl font-bold mb-2">
         <span class="hidden sm:inline">Калькулятор рейтинга {{ year }}</span>
@@ -11,23 +14,44 @@
       </h1>
 
       <!-- Pre-filled data indicator -->
-      <div v-if="isPreFilled" class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+      <div
+        v-if="isPreFilled"
+        class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg"
+      >
         <div class="flex items-center text-sm text-blue-800">
-          <UIcon name="i-heroicons-information-circle" class="w-4 h-4 mr-2" />
+          <UIcon
+            name="i-heroicons-information-circle"
+            class="w-4 h-4 mr-2"
+          />
           Данные автоматически заполнены из рейтинга
         </div>
       </div>
-
-
     </div>
 
     <div class="bg-white rounded-lg shadow-md p-6">
-      <form id="rating-form" class="grid grid-cols-1 md:grid-cols-4 gap-4" @submit.prevent>
-        <div v-for="(category, eventId) in events" :key="eventId" class="form-group">
-          <label :for="eventId" class="block text-sm font-medium text-gray-700 mb-1">{{ category.name }}:</label>
-          <input :id="eventId" v-model="eventPoints[eventId]" type="number" :min="0" :max="category.maxPoints"
+      <form
+        id="rating-form"
+        class="grid grid-cols-1 md:grid-cols-4 gap-4"
+        @submit.prevent
+      >
+        <div
+          v-for="(category, eventId) in events"
+          :key="eventId"
+          class="form-group"
+        >
+          <label
+            :for="eventId"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >{{ category.name }}:</label>
+          <input
+            :id="eventId"
+            v-model="eventPoints[eventId]"
+            type="number"
+            :min="0"
+            :max="category.maxPoints"
             :placeholder="`Макс: ${category.maxPoints}`"
-            class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          >
         </div>
 
         <div class="col-span-1 md:col-span-4 mt-6 space-y-6">
@@ -93,12 +117,18 @@
                 Шаг 2: Лучшие 4 результата из остальных соревнований
               </div>
               <div class="space-y-2">
-                <div v-for="(event, index) in calculatedResults.otherEvents" :key="index"
-                  class="flex justify-between items-center">
+                <div
+                  v-for="(event, index) in calculatedResults.otherEvents"
+                  :key="index"
+                  class="flex justify-between items-center"
+                >
                   <span>{{ event.name }}:</span>
                   <span class="font-mono">{{ event.points }}</span>
                 </div>
-                <div v-if="calculatedResults.otherEvents.length === 0" class="text-gray-500 italic">
+                <div
+                  v-if="calculatedResults.otherEvents.length === 0"
+                  class="text-gray-500 italic"
+                >
                   Нет дополнительных результатов
                 </div>
                 <div class="border-t border-gray-300 pt-2 mt-2">
@@ -126,14 +156,24 @@
 
       <!-- Collapsible Formula Image Section -->
       <div class="mt-6 border-t border-gray-200 pt-6">
-        <UButton variant="ghost" color="gray" size="sm" class="w-full justify-between"
-          @click="showFormula = !showFormula">
+        <UButton
+          variant="ghost"
+          color="gray"
+          size="sm"
+          class="w-full justify-between"
+          @click="showFormula = !showFormula"
+        >
           <span class="flex items-center">
-            <UIcon name="i-heroicons-document-text" class="w-4 h-4 mr-2" />
+            <UIcon
+              name="i-heroicons-document-text"
+              class="w-4 h-4 mr-2"
+            />
             {{ showFormula ? 'Скрыть формулу из Положения' : 'Показать формулу из Положения' }}
           </span>
-          <UIcon :name="showFormula ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
-            class="transition-transform duration-200" />
+          <UIcon
+            :name="showFormula ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+            class="transition-transform duration-200"
+          />
         </UButton>
 
         <UCollapsible v-model:open="showFormula">
@@ -142,12 +182,22 @@
               <div class="text-sm text-gray-700 mb-3">
                 Пункт 14.8 Положения о Любительской Лиге триатлона:
               </div>
-              <img src="/img/rating_points_formula.jpg" alt="Пункт 14.8 Положения о Любительской Лиге триатлона"
-                class="w-full h-auto rounded border border-gray-300">
+              <img
+                src="/img/rating_points_formula.jpg"
+                alt="Пункт 14.8 Положения о Любительской Лиге триатлона"
+                class="w-full h-auto rounded border border-gray-300"
+              >
               <div class="mt-3 text-xs text-gray-500">
-                <a href="https://triatlon.by/assets/images/files/2025/polozhenie-lyubitelskaya-liga-triatlona-2025.pdf"
-                  target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline flex items-center">
-                  <UIcon name="i-heroicons-arrow-top-right-on-square" class="w-3 h-3 mr-1" />
+                <a
+                  href="https://triatlon.by/assets/images/files/2025/polozhenie-lyubitelskaya-liga-triatlona-2025.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-blue-600 hover:underline flex items-center"
+                >
+                  <UIcon
+                    name="i-heroicons-arrow-top-right-on-square"
+                    class="w-3 h-3 mr-1"
+                  />
                   Открыть полное Положение
                 </a>
               </div>
@@ -160,7 +210,7 @@
 </template>
 
 <script setup lang="ts">
-import { useUrlSearchParams } from "@vueuse/core";
+import { useUrlSearchParams } from '@vueuse/core'
 
 const route = useRoute()
 const year = route.params.year as string
@@ -170,12 +220,12 @@ const breadcrumbLinks = [
   {
     label: 'Главная',
     to: '/',
-    icon: 'i-heroicons-home'
+    icon: 'i-heroicons-home',
   },
   {
     label: 'Калькулятор рейтинга',
-    icon: 'i-heroicons-calculator'
-  }
+    icon: 'i-heroicons-calculator',
+  },
 ]
 
 // Page metadata - mobile optimized title
@@ -189,7 +239,7 @@ useHead({
 // Load competition points data and competitions
 const { data: competitionPointsData } = await useFetch(`/api/${year}/competition-points`)
 const { data: competitionsData } = await useAsyncData('competitions', () => {
-  return queryCollection('competitions').where('stem', 'LIKE', `${year}%`).all();
+  return queryCollection('competitions').where('stem', 'LIKE', `${year}%`).all()
 })
 
 // Extract base points for each category
@@ -217,15 +267,16 @@ const events = computed(() => {
           eventsMap[eventKey] = {
             name: `${competition.title} - ${event.title}`,
             category: event.category,
-            maxPoints: event.points || basePoints.value[event.category] || 700
+            maxPoints: event.points || basePoints.value[event.category] || 700,
           }
         })
-      } else {
+      }
+      else {
         // Single event competition
         eventsMap[competition.slug] = {
           name: competition.title,
           category: competition.category,
-          maxPoints: competition.points || basePoints.value[competition.category] || 700
+          maxPoints: competition.points || basePoints.value[competition.category] || 700,
         }
       }
     })
