@@ -1,23 +1,11 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
-    <!-- Page Header -->
-    <div class="mb-8">
-      <UBreadcrumb
-        :items="breadcrumbLinks"
-        class="mb-4"
-      />
-      <h1 class="text-4xl font-bold mb-2 flex items-center">
-        <UIcon
-          name="i-heroicons-identification"
-          class="mr-3 text-blue-600"
-          size="lg"
-        />
-        Лицензии {{ year }}
-      </h1>
-      <p class="text-gray-600">
-        База данных лицензированных участников Любительской Лиги триатлона за {{ year }} год
-      </p>
-    </div>
+  <!-- Page Header -->
+  <div class="mb-6">
+    <UBreadcrumb :items="[
+      { label: 'Главная', to: '/', icon: 'i-heroicons-home' },
+      { label: `Лицензии ${year}` }
+    ]" class="mb-4" />
+  </div>
 
     <!-- Loading State -->
     <div
@@ -30,185 +18,115 @@
       </p>
     </div>
 
-    <!-- Error State -->
-    <div
-      v-else-if="error"
-      class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-8"
-    >
+    <div v-else-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl shadow-sm mb-8">
       <h2 class="font-bold flex items-center">
-        <UIcon
-          name="i-heroicons-exclamation-triangle"
-          class="mr-2"
-        />
+        <UIcon name="i-heroicons-exclamation-triangle" class="mr-2" />
         Ошибка загрузки данных:
       </h2>
       <pre class="mt-2 text-sm">{{ error }}</pre>
     </div>
 
-    <!-- Content -->
-    <div
-      v-else
-      class="space-y-8"
-    >
-      <!-- Search and Filters -->
-      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-        <h2 class="text-lg font-semibold mb-4 flex items-center">
-          <UIcon
-            name="i-heroicons-funnel"
-            class="mr-2 text-blue-600"
+    <div v-else class="space-y-8">
+      <!-- Statistics Cards (desktop only) -->
+      <div class="hidden sm:block mb-6">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatisticCard 
+            :value="baseFilteredLicenses.length"
+            label="Участников"
+            icon="i-heroicons-users"
+            icon-color="text-blue-600"
+            value-color="text-blue-600"
           />
-          Фильтры и поиск
-        </h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-              <UIcon
-                name="i-heroicons-magnifying-glass"
-                class="mr-1"
-              />
-              Поиск по имени
-            </label>
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Введите имя или фамилию..."
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-              <UIcon
-                name="i-heroicons-user"
-                class="mr-1"
-              />
-              Пол
-            </label>
-            <USelect
-              v-model="selectedGender"
-              :options="genderOptions"
-              placeholder="Все"
-              size="md"
-              class="w-full"
-            />
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-              <UIcon
-                name="i-heroicons-tag"
-                class="mr-1"
-              />
-              Возрастная группа
-            </label>
-            <USelect
-              v-model="selectedAgeGroup"
-              :options="ageGroupOptions"
-              placeholder="Все группы"
-              size="md"
-              class="w-full"
-            />
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-              <UIcon
-                name="i-heroicons-building-office"
-                class="mr-1"
-              />
-              Клуб
-            </label>
-            <USelect
-              v-model="selectedClub"
-              :options="clubOptions"
-              placeholder="Все клубы"
-              size="md"
-              class="w-full"
-            />
-          </div>
+          <StatisticCard 
+            :value="menCount"
+            label="Мужчин"
+            icon="i-heroicons-user"
+            icon-color="text-green-600"
+            value-color="text-green-600"
+          />
+          <StatisticCard 
+            :value="womenCount"
+            label="Женщин"
+            icon="i-heroicons-user"
+            icon-color="text-pink-600"
+            value-color="text-pink-600"
+          />
+          <StatisticCard 
+            :value="activeClubs"
+            label="Активных клубов"
+            icon="i-heroicons-building-office"
+            icon-color="text-purple-600"
+            value-color="text-purple-600"
+          />
         </div>
       </div>
 
-      <!-- Statistics -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div class="bg-blue-50 rounded-lg p-6 shadow-sm border border-blue-100">
-          <div class="flex items-center mb-2">
-            <UIcon
-              name="i-heroicons-identification"
-              class="text-blue-600 mr-2"
-              size="lg"
-            />
-            <div class="text-gray-600">
-              Всего лицензий
-            </div>
-          </div>
-          <div class="text-3xl font-bold text-blue-600">
-            {{ filteredLicenses.length }}
-          </div>
+      <!-- Search and Filters -->
+      <div class="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+        <h2 class="text-lg font-semibold mb-4 flex items-center sm:hidden">
+          <UIcon name="i-heroicons-funnel" class="mr-2 text-blue-600" />
+          Фильтры
+        </h2>
+        <h2 class="hidden sm:flex text-lg font-semibold mb-4 items-center">
+          <UIcon name="i-heroicons-funnel" class="mr-2 text-blue-600" />
+          Фильтры и поиск
+        </h2>
+
+        <!-- Category Tabs -->
+        <div class="mb-4">
+          <UTabs :items="genderTabs" :default-index="activeTabIndex" @change="handleTabChange">
+            <template #content="{ item }">
+              <!-- Empty content - we'll render below -->
+            </template>
+          </UTabs>
         </div>
 
-        <div class="bg-green-50 rounded-lg p-6 shadow-sm border border-green-100">
-          <div class="flex items-center mb-2">
-            <UIcon
-              name="i-heroicons-user"
-              class="text-green-600 mr-2"
-              size="lg"
-            />
-            <div class="text-gray-600">
-              Мужчин
-            </div>
+        <div class="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-1 md:grid-cols-3 sm:gap-4">
+          <!-- Search -->
+          <div class="sm:col-span-1">
+            <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+              <UIcon name="i-heroicons-magnifying-glass" class="mr-1" size="16" />
+              Поиск
+            </label>
+            <UInput v-model="searchQuery" type="text" placeholder="Имя спортсмена..." size="md" class="w-full" />
           </div>
-          <div class="text-3xl font-bold text-green-600">
-            {{ menCount }}
-          </div>
-        </div>
 
-        <div class="bg-pink-50 rounded-lg p-6 shadow-sm border border-pink-100">
-          <div class="flex items-center mb-2">
-            <UIcon
-              name="i-heroicons-user"
-              class="text-pink-600 mr-2"
-              size="lg"
-            />
-            <div class="text-gray-600">
-              Женщин
+          <!-- Filters in a row on mobile -->
+          <div class="grid grid-cols-2 gap-3 sm:col-span-2 sm:grid-cols-2 sm:gap-4">
+            <!-- Age group filter -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                <UIcon name="i-heroicons-tag" class="mr-1" size="16" />
+                Возраст
+              </label>
+              <USelect v-model="selectedAgeGroup" :items="ageGroupOptions" :disabled="ageGroups.length === 0"
+                size="md" class="w-full" />
+              <div v-if="ageGroups.length === 0" class="text-xs text-gray-500 mt-1">
+                Нет данных
+              </div>
             </div>
-          </div>
-          <div class="text-3xl font-bold text-pink-600">
-            {{ womenCount }}
-          </div>
-        </div>
 
-        <div class="bg-purple-50 rounded-lg p-6 shadow-sm border border-purple-100">
-          <div class="flex items-center mb-2">
-            <UIcon
-              name="i-heroicons-building-office"
-              class="text-purple-600 mr-2"
-              size="lg"
-            />
-            <div class="text-gray-600">
-              Активных клубов
+            <!-- Club filter -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                <UIcon name="i-heroicons-building-office" class="mr-1" size="16" />
+                Клуб
+              </label>
+              <USelect v-model="selectedClub" :items="clubOptions" :disabled="clubs.length === 0"
+                size="md" class="w-full" />
+              <div v-if="clubs.length === 0" class="text-xs text-gray-500 mt-1">
+                Нет данных
+              </div>
             </div>
-          </div>
-          <div class="text-3xl font-bold text-purple-600">
-            {{ activeClubs }}
           </div>
         </div>
       </div>
 
       <LicensesTable
-        :licenses="paginatedLicenses"
-        :filtered-count="filteredLicenses.length"
-        :current-page="currentPage"
-        :total-pages="totalPages"
-        :start-index="startIndex"
-        :end-index="endIndex"
-        :visible-pages="visiblePages"
-        @update:current-page="currentPage = $event"
+        class="md:bg-white rounded-lg md:shadow-sm"
+        :licenses="filteredLicenses"
       />
     </div>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -236,13 +154,39 @@ const { data: licenses, pending, error } = await useFetch(`/api/${props.year}/li
 
 // Search and filter state
 const searchQuery = ref('')
-const selectedGender = ref('')
-const selectedAgeGroup = ref('')
-const selectedClub = ref('')
+const selectedAgeGroup = ref('Все группы')
+const selectedClub = ref('Все клубы')
 
-// Pagination state
-const currentPage = ref(1)
-const itemsPerPage = 50
+// Tab configuration
+const activeTab = ref<'all' | 'men' | 'women'>('all')
+const genderTabs = [
+  {
+    key: 'all',
+    label: 'Все',
+    icon: 'i-heroicons-users',
+  },
+  {
+    key: 'men',
+    label: 'Мужчины',
+    icon: 'i-heroicons-user',
+  },
+  {
+    key: 'women',
+    label: 'Женщины',
+    icon: 'i-heroicons-user',
+  },
+]
+
+const activeTabIndex = computed(() => {
+  const index = genderTabs.findIndex(tab => tab.key === activeTab.value)
+  return index >= 0 ? index : 0
+})
+
+const handleTabChange = (index: number) => {
+  activeTab.value = genderTabs[index].key as 'all' | 'men' | 'women'
+}
+
+
 
 // Computed values for filters
 const ageGroups = computed(() => {
@@ -258,24 +202,18 @@ const clubs = computed(() => {
 })
 
 // Options for USelect components
-const genderOptions = computed(() => [
-  { label: 'Все', value: '' },
-  { label: 'Мужчины', value: 'Мужской' },
-  { label: 'Женщины', value: 'Женский' },
-])
-
 const ageGroupOptions = computed(() => [
-  { label: 'Все группы', value: '' },
-  ...ageGroups.value.map(ag => ({ label: ag, value: ag })),
+  'Все группы',
+  ...ageGroups.value,
 ])
 
 const clubOptions = computed(() => [
-  { label: 'Все клубы', value: '' },
-  ...clubs.value.map(club => ({ label: club, value: club })),
+  'Все клубы',
+  ...clubs.value,
 ])
 
-// Filtered licenses
-const filteredLicenses = computed(() => {
+// Base filtered licenses (without gender filtering)
+const baseFilteredLicenses = computed(() => {
   if (!licenses.value) return []
 
   let filtered = licenses.value
@@ -288,52 +226,45 @@ const filteredLicenses = computed(() => {
     )
   }
 
-  if (selectedGender.value) {
-    filtered = filtered.filter(license => license.gender === selectedGender.value)
-  }
-
-  if (selectedAgeGroup.value) {
+  if (selectedAgeGroup.value && selectedAgeGroup.value !== 'Все группы') {
     filtered = filtered.filter(license => license.ageGroup === selectedAgeGroup.value)
   }
 
-  if (selectedClub.value) {
+  if (selectedClub.value && selectedClub.value !== 'Все клубы') {
     filtered = filtered.filter(license => license.club === selectedClub.value)
   }
 
   return filtered
 })
 
-// Pagination
-const totalPages = computed(() => Math.ceil(filteredLicenses.value.length / itemsPerPage))
-const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage)
-const endIndex = computed(() => startIndex.value + itemsPerPage)
+// Filtered licenses based on active tab
+const filteredLicenses = computed(() => {
+  let filtered = baseFilteredLicenses.value
 
-const paginatedLicenses = computed(() =>
-  filteredLicenses.value.slice(startIndex.value, endIndex.value),
-)
-
-const visiblePages = computed(() => {
-  const pages = []
-  const start = Math.max(1, currentPage.value - 2)
-  const end = Math.min(totalPages.value, currentPage.value + 2)
-
-  for (let i = start; i <= end; i++) {
-    pages.push(i)
+  switch (activeTab.value) {
+    case 'men':
+      filtered = filtered.filter(license => license.gender === 'Мужской')
+      break
+    case 'women':
+      filtered = filtered.filter(license => license.gender === 'Женский')
+      break
+    default:
+      // 'all' - no additional filtering
+      break
   }
 
-  return pages
+  return filtered
 })
 
-// Statistics
-const menCount = computed(() => filteredLicenses.value.filter(l => l.gender === 'Мужской').length)
-const womenCount = computed(() => filteredLicenses.value.filter(l => l.gender === 'Женский').length)
+
+
+// Statistics based on base filtered data
+const menCount = computed(() => baseFilteredLicenses.value.filter(l => l.gender === 'Мужской').length)
+const womenCount = computed(() => baseFilteredLicenses.value.filter(l => l.gender === 'Женский').length)
 const activeClubs = computed(() => {
-  const clubSet = new Set(filteredLicenses.value.map(l => l.club).filter(Boolean))
+  const clubSet = new Set(baseFilteredLicenses.value.map(l => l.club).filter(Boolean))
   return clubSet.size
 })
 
-// Reset pagination when filters change
-watch([searchQuery, selectedGender, selectedAgeGroup, selectedClub], () => {
-  currentPage.value = 1
-})
+
 </script>
