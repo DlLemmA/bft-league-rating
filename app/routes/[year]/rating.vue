@@ -64,9 +64,18 @@
           Фильтры
         </h2>
         <h2 class="hidden sm:flex text-lg font-semibold mb-4 items-center">
-          <UIcon name="i filtecons-funnel" class="mr-2 text-blue-600" />
+          <UIcon name="i-heroicons-funnel" class="mr-2 text-blue-600" />
           Фильтры и поиск
         </h2>
+
+        <!-- Category Tabs -->
+        <div class="mb-4">
+          <UTabs :items="ratingTabs" :default-index="activeTabIndex" @change="handleTabChange">
+            <template #content="{ item }">
+              <!-- Empty content - we'll render below -->
+            </template>
+          </UTabs>
+        </div>
 
         <div class="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-1 md:grid-cols-3 sm:gap-4">
           <!-- Search -->
@@ -86,8 +95,8 @@
                 <UIcon name="i-heroicons-building-office" class="mr-1" size="16" />
                 Клуб
               </label>
-              <USelect v-model="selectedClub" :options="clubOptions" :disabled="availableClubs.length === 0"
-                placeholder="Все клубы" size="md" class="w-full" />
+              <USelect v-model="selectedClub" :items="clubOptions" :disabled="availableClubs.length === 0"
+                size="md" class="w-full" />
               <div v-if="availableClubs.length === 0" class="text-xs text-gray-500 mt-1">
                 Нет данных
               </div>
@@ -99,8 +108,8 @@
                 <UIcon name="i-heroicons-tag" class="mr-1" size="16" />
                 Возраст
               </label>
-              <USelect v-model="selectedAgeGroup" :options="ageGroupOptions" :disabled="availableAgeGroups.length === 0"
-                placeholder="Все группы" size="md" class="w-full" />
+              <USelect v-model="selectedAgeGroup" :items="ageGroupOptions" :disabled="availableAgeGroups.length === 0"
+                size="md" class="w-full" />
               <div v-if="availableAgeGroups.length === 0" class="text-xs text-gray-500 mt-1">
                 Нет данных
               </div>
@@ -109,56 +118,10 @@
         </div>
       </div>
 
-      <!-- Rating Table with Tabs -->
-      <UTabs :items="ratingTabs" :default-index="activeTabIndex"
-        class="bg-white rounded-lg shadow-sm border border-gray-200" @change="handleTabChange">
-        <template #content="{ item }">
-          <div v-if="item.key === 'all'" class="space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-6 py-4 border-b border-gray-100">
-              <div class="flex items-center mb-2 sm:mb-0">
-                <UIcon name="i-heroicons-users" class="mr-2 text-blue-600" />
-                <h3 class="text-lg sm:text-xl font-bold">Все</h3>
-              </div>
-              <span class="text-sm text-gray-500">
-                Найдено: {{ filteredRatingData.length }} из {{ ratingData?.length || 0 }}
-              </span>
-            </div>
-
-            <RatingTable :athletes="filteredRatingData" @show-details="showAthleteDetails" />
-          </div>
-
-          <div v-else-if="item.key === 'men'" class="space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-6 py-4 border-b border-gray-100">
-              <div class="flex items-center mb-2 sm:mb-0">
-                <UIcon name="i-heroicons-user" class="mr-2 text-green-600" />
-                <h3 class="text-lg sm:text-xl font-bold">Мужчины</h3>
-              </div>
-              <span class="text-sm text-gray-500">
-                Найдено: {{ filteredMenData.length }} из {{ menCount }}
-              </span>
-            </div>
-
-            <RatingTable :athletes="filteredMenData" @show-details="showAthleteDetails" />
-          </div>
-
-          <div v-else-if="item.key === 'women'" class="space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-6 py-4 border-b border-gray-100">
-              <div class="flex items-center mb-2 sm:mb-0">
-                <UIcon name="i-heroicons-user" class="mr-2 text-pink-600" />
-                <h3 class="text-lg sm:text-xl font-bold">Женщины</h3>
-              </div>
-              <span class="text-sm text-gray-500">
-                Найдено: {{ filteredWomenData.length }} из {{ womenCount }}
-              </span>
-            </div>
-
-            <RatingTable :athletes="filteredWomenData" @show-details="showAthleteDetails" />
-          </div>
-        </template>
-      </UTabs>
+      <RatingTable class="md:bg-white rounded-lg md:shadow-sm" :athletes="getCurrentData()" @show-details="showAthleteDetails" />
 
       <!-- Rating Details Drawer -->
-      <RatingDetailsDrawer v-model:open="showDetailsDrawer" :athlete="selectedAthlete" />
+      <RatingDetailsDrawer v-if="selectedAthlete" v-model:open="showDetailsDrawer" :athlete="selectedAthlete" />
     </div>
 </template>
 
@@ -181,8 +144,8 @@ const { data: ratingData, pending, error } = await useFetch(`/api/${year}/rating
 
 // State for search and filters
 const searchQuery = ref('')
-const selectedClub = ref('')
-const selectedAgeGroup = ref('')
+const selectedClub = ref('Все клубы')
+const selectedAgeGroup = ref('Все группы')
 
 // State for competition details drawer
 const showDetailsDrawer = ref(false)
@@ -232,13 +195,13 @@ const availableAgeGroups = computed(() => {
 
 // Options for USelect components
 const clubOptions = computed(() => [
-  { label: 'Все клубы', value: '' },
-  ...availableClubs.value.map(club => ({ label: club, value: club })),
+  'Все клубы',
+  ...availableClubs.value,
 ])
 
 const ageGroupOptions = computed(() => [
-  { label: 'Все группы', value: '' },
-  ...availableAgeGroups.value.map(group => ({ label: group, value: group })),
+  'Все группы',
+  ...availableAgeGroups.value,
 ])
 
 const menCount = computed(() => {
@@ -294,12 +257,12 @@ const filteredRatingData = computed(() => {
   }
 
   // Filter by club
-  if (selectedClub.value) {
+  if (selectedClub.value && selectedClub.value !== 'Все клубы') {
     filtered = filtered.filter((athlete: any) => athlete.club === selectedClub.value)
   }
 
   // Filter by age group
-  if (selectedAgeGroup.value) {
+  if (selectedAgeGroup.value && selectedAgeGroup.value !== 'Все группы') {
     filtered = filtered.filter((athlete: any) => athlete.ageGroup === selectedAgeGroup.value)
   }
 
@@ -323,12 +286,12 @@ const filteredMenData = computed(() => {
   }
 
   // Filter by club
-  if (selectedClub.value) {
+  if (selectedClub.value && selectedClub.value !== 'Все клубы') {
     filtered = filtered.filter((athlete: any) => athlete.club === selectedClub.value)
   }
 
   // Filter by age group
-  if (selectedAgeGroup.value) {
+  if (selectedAgeGroup.value && selectedAgeGroup.value !== 'Все группы') {
     filtered = filtered.filter((athlete: any) => athlete.ageGroup === selectedAgeGroup.value)
   }
 
@@ -351,17 +314,73 @@ const filteredWomenData = computed(() => {
   }
 
   // Filter by club
-  if (selectedClub.value) {
+  if (selectedClub.value && selectedClub.value !== 'Все клубы') {
     filtered = filtered.filter((athlete: any) => athlete.club === selectedClub.value)
   }
 
   // Filter by age group
-  if (selectedAgeGroup.value) {
+  if (selectedAgeGroup.value && selectedAgeGroup.value !== 'Все группы') {
     filtered = filtered.filter((athlete: any) => athlete.ageGroup === selectedAgeGroup.value)
   }
 
   return filtered
 })
+
+// Helper methods for current tab
+const getCurrentData = () => {
+  switch (activeTab.value) {
+    case 'men':
+      return filteredMenData.value
+    case 'women':
+      return filteredWomenData.value
+    default:
+      return filteredRatingData.value
+  }
+}
+
+const getCurrentCount = () => {
+  switch (activeTab.value) {
+    case 'men':
+      return filteredMenData.value.length
+    case 'women':
+      return filteredWomenData.value.length
+    default:
+      return filteredRatingData.value.length
+  }
+}
+
+const getCurrentTabLabel = () => {
+  switch (activeTab.value) {
+    case 'men':
+      return 'Мужчины'
+    case 'women':
+      return 'Женщины'
+    default:
+      return 'Все участники'
+  }
+}
+
+const getCurrentTabIcon = () => {
+  switch (activeTab.value) {
+    case 'men':
+      return 'i-heroicons-user'
+    case 'women':
+      return 'i-heroicons-user'
+    default:
+      return 'i-heroicons-users'
+  }
+}
+
+const getCurrentTabColor = () => {
+  switch (activeTab.value) {
+    case 'men':
+      return 'text-green-600'
+    case 'women':
+      return 'text-pink-600'
+    default:
+      return 'text-blue-600'
+  }
+}
 
 // Method to show athlete details
 const showAthleteDetails = (athlete: any) => {

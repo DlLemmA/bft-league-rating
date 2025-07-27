@@ -28,7 +28,7 @@
               <span v-if="result.gender" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
                 :class="result.gender === 'male' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800'">
                 <UIcon name="i-heroicons-user" class="mr-1" size="xs" />
-                {{ result.gender === 'male' ? 'Мужской' : 'Женский' }}
+                {{ result.gender === 'male' ? 'Мужчина' : 'Женщина' }}
               </span>
               <span v-if="result.ageGroup"
                 class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">

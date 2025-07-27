@@ -274,24 +274,113 @@ export default defineEventHandler(async (event: any) => {
   const sortedLicenses = licensesWithPoints.sort((licenseA, licenseB) => (licenseB.totalPoints || 0) - (licenseA.totalPoints || 0))
 
   // Calculate places for athletes (absolute, gender, and age group)
-  return calculatePlaces(sortedLicenses)
+  return calculatePlaces(sortedLicenses, competitions)
 })
 
 /**
  * Calculate places for athletes (absolute, gender, and age group)
  * Top 3 athletes in each gender category are excluded from age group rankings
  */
-function calculatePlaces(athletes: License[]): License[] {
+function calculatePlaces(athletes: License[], competitions: any[]): License[] {
   if (!athletes || athletes.length === 0) return []
 
-  // Assign absolute places (athletes are already sorted by points)
-  athletes.forEach((athlete, index) => {
+  // Sort competitions by end date to determine the latest competition
+  const sortedCompetitions = competitions
+    .filter(comp => comp.hasResults && comp.endDate)
+    .sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime())
+
+  if (sortedCompetitions.length === 0) {
+    // No competitions with results, just assign current places
+    return assignCurrentPlaces(athletes)
+  }
+
+  // Get the latest competition
+  const latestCompetition = sortedCompetitions[0]
+  const previousCompetitions = sortedCompetitions.slice(1)
+
+  // Calculate previous places (all competitions except the latest one)
+  const athletesWithPreviousPoints = calculatePreviousPoints(athletes, previousCompetitions)
+  const athletesWithPreviousPlaces = assignCurrentPlaces(athletesWithPreviousPoints)
+
+  // Store previous places
+  athletesWithPreviousPlaces.forEach(athlete => {
+    athlete.previousAbsolutePlace = athlete.absolutePlace
+    athlete.previousGenderPlace = athlete.genderPlace
+    athlete.previousAgeGroupPlace = athlete.ageGroupPlace
+  })
+
+  // Calculate current places (all competitions including the latest)
+  const athletesWithCurrentPlaces = assignCurrentPlaces(athletes)
+
+  // Merge previous places into current athletes
+  athletesWithCurrentPlaces.forEach(athlete => {
+    const previousAthlete = athletesWithPreviousPlaces.find(prev => prev.id === athlete.id)
+    if (previousAthlete) {
+      athlete.previousAbsolutePlace = previousAthlete.previousAbsolutePlace
+      athlete.previousGenderPlace = previousAthlete.previousGenderPlace
+      athlete.previousAgeGroupPlace = previousAthlete.previousAgeGroupPlace
+    }
+  })
+
+  return athletesWithCurrentPlaces
+}
+
+/**
+ * Calculate points for athletes excluding the latest competition
+ */
+function calculatePreviousPoints(athletes: License[], previousCompetitions: any[]): License[] {
+  return athletes.map(athlete => {
+    const previousAthlete = { ...athlete }
+    
+    // Filter competitions to only include previous ones
+    if (previousAthlete.competitions) {
+      const previousCompetitionSlugs = new Set()
+      
+      previousCompetitions.forEach(comp => {
+        if (Array.isArray(comp.events)) {
+          comp.events.forEach((event: any) => {
+            previousCompetitionSlugs.add(`${comp.slug}-${event.slug}`)
+          })
+        } else {
+          previousCompetitionSlugs.add(comp.slug)
+        }
+      })
+
+      // Keep only competitions that are in the previous competitions list
+      previousAthlete.competitions = previousAthlete.competitions.filter(comp => 
+        previousCompetitionSlugs.has(comp.competition)
+      )
+
+      // Recalculate total points with previous competitions only
+      const eventsPoints: EventPoints[] = previousAthlete.competitions.map(comp => ({
+        eventName: comp.competition,
+        eventCategory: comp.category,
+        points: comp.points
+      }))
+
+      const calculatedPoints = calculateTotalPoints(eventsPoints)
+      previousAthlete.totalPoints = Number(calculatedPoints.toFixed(2))
+    }
+
+    return previousAthlete
+  }).sort((a, b) => (b.totalPoints || 0) - (a.totalPoints || 0))
+}
+
+/**
+ * Assign places to athletes based on their current total points
+ */
+function assignCurrentPlaces(athletes: License[]): License[] {
+  // Sort by total points
+  const sortedAthletes = [...athletes].sort((a, b) => (b.totalPoints || 0) - (a.totalPoints || 0))
+
+  // Assign absolute places
+  sortedAthletes.forEach((athlete, index) => {
     athlete.absolutePlace = index + 1
   })
 
   // Group athletes by gender
-  const menAthletes = athletes.filter(athlete => athlete.gender === 'Мужской')
-  const womenAthletes = athletes.filter(athlete => athlete.gender === 'Женский')
+  const menAthletes = sortedAthletes.filter(athlete => athlete.gender === 'Мужской')
+  const womenAthletes = sortedAthletes.filter(athlete => athlete.gender === 'Женский')
 
   // Assign gender places
   menAthletes.forEach((athlete, index) => {
@@ -305,7 +394,7 @@ function calculatePlaces(athletes: License[]): License[] {
   // Group athletes by age group, excluding top 3 athletes in each gender category
   const ageGroups: Record<string, License[]> = {}
 
-  athletes.forEach((athlete) => {
+  sortedAthletes.forEach((athlete) => {
     // Skip top 3 athletes in their gender category for age group calculations
     if (athlete.ageGroup && athlete.genderPlace && athlete.genderPlace > 3) {
       if (!ageGroups[athlete.ageGroup]) {
@@ -324,5 +413,5 @@ function calculatePlaces(athletes: License[]): License[] {
     })
   })
 
-  return athletes
+  return sortedAthletes
 }

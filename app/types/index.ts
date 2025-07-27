@@ -16,6 +16,9 @@ export interface License {
   ageGroupPlace?: number
   genderPlace?: number
   absolutePlace?: number
+  previousAgeGroupPlace?: number
+  previousGenderPlace?: number
+  previousAbsolutePlace?: number
   competitions?: CompetitionResult[]
   totalPoints?: number
 }

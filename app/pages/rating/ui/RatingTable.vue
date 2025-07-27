@@ -25,12 +25,6 @@
             </th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               <div class="flex items-center">
-                <UIcon name="i-heroicons-tag" class="mr-1" />
-                Категория
-              </div>
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              <div class="flex items-center">
                 <UIcon name="i-heroicons-star" class="mr-1" />
                 Очки
               </div>
@@ -51,6 +45,18 @@
                   <div :class="getBestPlaceType(athlete) === 'absolute' ? 'text-yellow-700 font-bold' : 'text-gray-700'">
                     {{ athlete.absolutePlace || '—' }}
                   </div>
+                  <!-- Trend for absolute place -->
+                  <div v-if="athlete.previousAbsolutePlace && athlete.absolutePlace" class="text-xs mt-1">
+                    <span v-if="athlete.absolutePlace < athlete.previousAbsolutePlace" class="text-green-600">
+                      ↗ {{ athlete.previousAbsolutePlace }}→{{ athlete.absolutePlace }}
+                    </span>
+                    <span v-else-if="athlete.absolutePlace > athlete.previousAbsolutePlace" class="text-red-600">
+                      ↘ {{ athlete.previousAbsolutePlace }}→{{ athlete.absolutePlace }}
+                    </span>
+                    <span v-else class="text-gray-500">
+                      = {{ athlete.absolutePlace }}
+                    </span>
+                  </div>
                 </div>
                 
                 <!-- Gender Place -->
@@ -58,12 +64,24 @@
                   'text-center p-1 rounded',
                   getBestPlaceType(athlete) === 'gender' ? (athlete.gender === 'Мужской' ? 'bg-blue-100 border border-blue-300' : 'bg-pink-100 border border-pink-300') : 'bg-gray-50'
                 ]">
-                  <div class="text-xs text-gray-500 mb-1">{{ athlete.gender === 'Мужской' ? 'М' : 'Ж' }}</div>
+                  <div class="text-xs text-gray-500 mb-1">{{ athlete.gender === 'Мужской' ? 'Муж' : 'Жен' }}</div>
                   <div :class="getBestPlaceType(athlete) === 'gender' ? (athlete.gender === 'Мужской' ? 'text-blue-700 font-bold' : 'text-pink-700 font-bold') : 'text-gray-700'">
                     <span v-if="athlete.genderPlace <= 3" class="mr-1">
                       {{ athlete.genderPlace === 1 ? '🥇' : athlete.genderPlace === 2 ? '🥈' : '🥉' }}
                     </span>
                     {{ athlete.genderPlace || '—' }}
+                  </div>
+                  <!-- Trend for gender place -->
+                  <div v-if="athlete.previousGenderPlace && athlete.genderPlace" class="text-xs mt-1">
+                    <span v-if="athlete.genderPlace < athlete.previousGenderPlace" class="text-green-600">
+                      ↗ {{ athlete.previousGenderPlace }}→{{ athlete.genderPlace }}
+                    </span>
+                    <span v-else-if="athlete.genderPlace > athlete.previousGenderPlace" class="text-red-600">
+                      ↘ {{ athlete.previousGenderPlace }}→{{ athlete.genderPlace }}
+                    </span>
+                    <span v-else class="text-gray-500">
+                      = {{ athlete.genderPlace }}
+                    </span>
                   </div>
                 </div>
                 
@@ -78,6 +96,18 @@
                       {{ athlete.ageGroupPlace === 1 ? '🥇' : athlete.ageGroupPlace === 2 ? '🥈' : '🥉' }}
                     </span>
                     {{ athlete.ageGroupPlace || '—' }}
+                  </div>
+                  <!-- Trend for age group place -->
+                  <div v-if="athlete.previousAgeGroupPlace && athlete.ageGroupPlace" class="text-xs mt-1">
+                    <span v-if="athlete.ageGroupPlace < athlete.previousAgeGroupPlace" class="text-green-600">
+                      ↗ {{ athlete.previousAgeGroupPlace }}→{{ athlete.ageGroupPlace }}
+                    </span>
+                    <span v-else-if="athlete.ageGroupPlace > athlete.previousAgeGroupPlace" class="text-red-600">
+                      ↘ {{ athlete.previousAgeGroupPlace }}→{{ athlete.ageGroupPlace }}
+                    </span>
+                    <span v-else class="text-gray-500">
+                      = {{ athlete.ageGroupPlace }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -106,17 +136,6 @@
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <div v-if="athlete.ageGroup" class="text-sm text-gray-900">
-                <span
-                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
-                  {{ athlete.ageGroup }}
-                </span>
-              </div>
-              <div v-else class="text-sm text-gray-500">
-                —
-              </div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
               <div class="text-sm font-medium text-blue-600">
                 {{ formatPoints(athlete.totalPoints) }}
               </div>
@@ -129,7 +148,7 @@
     <!-- Mobile Rating Cards -->
     <div class="md:hidden space-y-3">
       <div v-for="(athlete, index) in athletes" :key="athlete.id"
-        class="bg-white rounded-lg border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors"
+        class="rounded-lg border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors bg-white"
         @click="$emit('show-details', athlete)">
         
         <!-- Card Header -->
@@ -151,7 +170,7 @@
                   <UIcon name="i-heroicons-identification" class="mr-1" size="14" />
                   <span class="mr-3">№{{ athlete.id }}</span>
                   <UIcon name="i-heroicons-user" class="mr-1" size="14" />
-                  <span>{{ athlete.gender === 'Мужской' ? 'Мужчины' : 'Женщины' }}</span>
+                  <span>{{ athlete.gender === 'Мужской' ? 'Мужчина' : 'Женщина' }}</span>
                 </div>
               </div>
             </div>
@@ -193,6 +212,18 @@
               <div :class="getBestPlaceType(athlete) === 'absolute' ? 'text-yellow-700 font-bold' : 'text-gray-700'">
                 {{ athlete.absolutePlace || '—' }}
               </div>
+              <!-- Trend for absolute place -->
+              <div v-if="athlete.previousAbsolutePlace && athlete.absolutePlace" class="text-xs mt-1">
+                <span v-if="athlete.absolutePlace < athlete.previousAbsolutePlace" class="text-green-600">
+                  ↗ {{ athlete.previousAbsolutePlace }}→{{ athlete.absolutePlace }}
+                </span>
+                <span v-else-if="athlete.absolutePlace > athlete.previousAbsolutePlace" class="text-red-600">
+                  ↘ {{ athlete.previousAbsolutePlace }}→{{ athlete.absolutePlace }}
+                </span>
+                <span v-else class="text-gray-500">
+                  = {{ athlete.absolutePlace }}
+                </span>
+              </div>
             </div>
             
             <!-- Gender Place -->
@@ -200,12 +231,24 @@
               'text-center p-2 rounded',
               getBestPlaceType(athlete) === 'gender' ? (athlete.gender === 'Мужской' ? 'bg-blue-100 border border-blue-300' : 'bg-pink-100 border border-pink-300') : ''
             ]">
-              <div class="text-xs text-gray-500 mb-1">{{ athlete.gender === 'Мужской' ? 'Мужчины' : 'Женщины' }}</div>
+              <div class="text-xs text-gray-500 mb-1">{{ athlete.gender === 'Мужской' ? 'Муж' : 'Жен' }}</div>
               <div :class="getBestPlaceType(athlete) === 'gender' ? (athlete.gender === 'Мужской' ? 'text-blue-700 font-bold' : 'text-pink-700 font-bold') : 'text-gray-700'">
                 <span v-if="athlete.genderPlace <= 3" class="mr-1">
                   {{ athlete.genderPlace === 1 ? '🥇' : athlete.genderPlace === 2 ? '🥈' : '🥉' }}
                 </span>
                 {{ athlete.genderPlace || '—' }}
+              </div>
+              <!-- Trend for gender place -->
+              <div v-if="athlete.previousGenderPlace && athlete.genderPlace" class="text-xs mt-1">
+                <span v-if="athlete.genderPlace < athlete.previousGenderPlace" class="text-green-600">
+                  ↗ {{ athlete.previousGenderPlace }}→{{ athlete.genderPlace }}
+                </span>
+                <span v-else-if="athlete.genderPlace > athlete.previousGenderPlace" class="text-red-600">
+                  ↘ {{ athlete.previousGenderPlace }}→{{ athlete.genderPlace }}
+                </span>
+                <span v-else class="text-gray-500">
+                  = {{ athlete.genderPlace }}
+                </span>
               </div>
             </div>
             
@@ -220,6 +263,18 @@
                   {{ athlete.ageGroupPlace === 1 ? '🥇' : athlete.ageGroupPlace === 2 ? '🥈' : '🥉' }}
                 </span>
                 {{ athlete.ageGroupPlace || '—' }}
+              </div>
+              <!-- Trend for age group place -->
+              <div v-if="athlete.previousAgeGroupPlace && athlete.ageGroupPlace" class="text-xs mt-1">
+                <span v-if="athlete.ageGroupPlace < athlete.previousAgeGroupPlace" class="text-green-600">
+                  ↗ {{ athlete.previousAgeGroupPlace }}→{{ athlete.ageGroupPlace }}
+                </span>
+                <span v-else-if="athlete.ageGroupPlace > athlete.previousAgeGroupPlace" class="text-red-600">
+                  ↘ {{ athlete.previousAgeGroupPlace }}→{{ athlete.ageGroupPlace }}
+                </span>
+                <span v-else class="text-gray-500">
+                  = {{ athlete.ageGroupPlace }}
+                </span>
               </div>
             </div>
           </div>
@@ -435,5 +490,77 @@ const getBestPlaceType = (athlete: License): 'absolute' | 'gender' | 'ageGroup' 
   }
   
   return bestPlaces[0].type
+}
+
+const getPlaceTrend = (athlete: License): 'up' | 'down' | 'same' | null => {
+  // Get the best place type for current and previous positions
+  const currentBestType = getBestPlaceType(athlete)
+  if (!currentBestType) return null
+
+  let currentPlace: number | undefined
+  let previousPlace: number | undefined
+
+  // Get current and previous places based on the best place type
+  switch (currentBestType) {
+    case 'absolute':
+      currentPlace = athlete.absolutePlace
+      previousPlace = athlete.previousAbsolutePlace
+      break
+    case 'gender':
+      currentPlace = athlete.genderPlace
+      previousPlace = athlete.previousGenderPlace
+      break
+    case 'ageGroup':
+      currentPlace = athlete.ageGroupPlace
+      previousPlace = athlete.previousAgeGroupPlace
+      break
+  }
+
+  // Compare places (lower number = better place)
+  if (currentPlace && previousPlace) {
+    if (currentPlace < previousPlace) return 'up'    // Improved position
+    if (currentPlace > previousPlace) return 'down'  // Declined position
+    return 'same'  // Same position
+  }
+
+  return null  // No historical data available
+}
+
+const getTrendText = (athlete: License): string => {
+  const currentBestType = getBestPlaceType(athlete)
+  if (!currentBestType) return ''
+
+  let currentPlace: number | undefined
+  let previousPlace: number | undefined
+  let categoryName = ''
+
+  // Get current and previous places based on the best place type
+  switch (currentBestType) {
+    case 'absolute':
+      currentPlace = athlete.absolutePlace
+      previousPlace = athlete.previousAbsolutePlace
+      categoryName = 'общий'
+      break
+    case 'gender':
+      currentPlace = athlete.genderPlace
+      previousPlace = athlete.previousGenderPlace
+      categoryName = athlete.gender === 'Мужской' ? 'муж' : 'жен'
+      break
+    case 'ageGroup':
+      currentPlace = athlete.ageGroupPlace
+      previousPlace = athlete.previousAgeGroupPlace
+      categoryName = athlete.ageGroup || 'возр'
+      break
+  }
+
+  if (currentPlace && previousPlace) {
+    const change = Math.abs(currentPlace - previousPlace)
+    if (change === 0) {
+      return `${currentPlace} (${categoryName})`
+    }
+    return `${previousPlace}→${currentPlace} (${categoryName})`
+  }
+
+  return currentPlace ? `${currentPlace} (${categoryName})` : ''
 }
 </script>
