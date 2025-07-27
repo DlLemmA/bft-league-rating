@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
 
   const licensesData = await queryCollection(event, 'licenses').where('stem', 'LIKE', `${year}%`).first()
 
-  const licenses = licensesData?.body.map(transformLicense) || []
+  const licenses = licensesData?.body.map(transformLicense).filter(license => license.id.startsWith('AG')) || []
 
   return licenses
 })

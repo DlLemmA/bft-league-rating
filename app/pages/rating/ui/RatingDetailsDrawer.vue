@@ -15,7 +15,7 @@
       <div class="mb-6">
         <div class="flex items-center space-x-3 mb-4">
           <UAvatar
-            :src="athlete.license ? athlete.license.avatarSrc : null"
+            :src="athlete.avatarSrc"
             :alt="athlete.fioRussian"
             size="lg"
           />
