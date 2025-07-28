@@ -1,8 +1,7 @@
 import { timeToSeconds } from './shared'
 import type { EventResult } from './shared'
 
-// Transformer for minskIndoor format (Indoor Triathlon)
-export default function transformMinskIndoor(data: any[]): EventResult[] {
+export default function transformMinskIndoor(data: unknown[]): EventResult[] {
   return data.map(row => ({
     nickname: row['ФИО'],
     number: row['Номер'],

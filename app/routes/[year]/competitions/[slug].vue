@@ -81,12 +81,10 @@
       v-else
       class="space-y-8"
     >
-      <!-- Multi-event competition display -->
       <div
         v-if="hasMultipleEvents"
         class="space-y-8"
       >
-        <!-- Overall Statistics -->
         <CompetitionStatisticsCards :statistics="competitionData.statistics" />
 
         <div class="bg-blue-50 rounded-xl shadow-sm border border-blue-100 p-6">
@@ -187,12 +185,9 @@
         </div>
       </div>
 
-      <!-- Single event or selected event results -->
       <div v-if="!hasMultipleEvents || selectedEvent">
-        <!-- Statistics Cards -->
         <CompetitionStatisticsCards :statistics="currentStatistics" />
 
-        <!-- Back to events button for multi-event competitions -->
         <div
           v-if="hasMultipleEvents && selectedEvent"
           class="mb-4"
@@ -208,9 +203,7 @@
           </UButton>
         </div>
 
-        <!-- Results Display -->
         <div v-if="currentStatistics.total > 0">
-          <!-- Search and Filters -->
           <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 mb-6">
             <h2 class="text-lg font-semibold mb-4 flex items-center">
               <UIcon
@@ -386,7 +379,6 @@
           </UTabs>
         </div>
 
-        <!-- No results message -->
         <div
           v-else
           class="text-center py-12 text-gray-500 bg-white rounded-xl shadow-md border border-gray-100"
@@ -406,7 +398,6 @@
       </div>
     </div>
 
-    <!-- Result Details Drawer -->
     <CompetitionResultDetailsDrawer
       v-if="selectedResult"
       v-model:open="showDetailsDrawer"
@@ -420,7 +411,6 @@ const route = useRoute()
 const year = route.params.year as string
 const slug = route.params.slug as string
 
-// Load competition data from API
 const { data: competitionData, pending, error } = await useFetch(`/api/${year}/competitions/${slug}`)
 
 if (!competitionData.value) {
@@ -430,7 +420,6 @@ if (!competitionData.value) {
   })
 }
 
-// Page metadata
 useHead({
   title: `${competitionData.value.title} ${year} - Результаты | ЛЛТ`,
   meta: [
@@ -453,14 +442,11 @@ useHead({
   ],
 })
 
-// State for multi-event competitions
 const selectedEvent = ref(null)
 
-// State for result details drawer
 const selectedResult = ref(null)
 const showDetailsDrawer = ref(false)
 
-// Breadcrumb navigation
 const breadcrumbLinks = computed(() => [
   {
     label: 'Главная',
@@ -473,7 +459,6 @@ const breadcrumbLinks = computed(() => [
   },
 ])
 
-// Computed properties
 const hasMultipleEvents = computed(() => {
   return competitionData.value?.events && competitionData.value.events.length > 0
 })
@@ -497,26 +482,22 @@ const currentWomenResults = computed(() => {
   return currentAllResults.value.filter(result => result.gender === 'female')
 })
 
-// Search and filter state
 const searchQuery = ref('')
 const selectedClub = ref('')
 const selectedAgeGroup = ref('')
 
-// Available clubs for filtering
 const availableClubs = computed(() => {
   if (!currentAllResults.value || currentAllResults.value.length === 0) return []
   const clubSet = new Set(currentAllResults.value.map(r => r.club).filter(Boolean))
   return Array.from(clubSet).sort()
 })
 
-// Available age groups for filtering
 const availableAgeGroups = computed(() => {
   if (!currentAllResults.value || currentAllResults.value.length === 0) return []
   const ageGroupSet = new Set(currentAllResults.value.map(r => r.ageGroup).filter(Boolean))
   return Array.from(ageGroupSet).sort()
 })
 
-// Options for USelect components
 const clubOptions = computed(() => [
   { label: 'Все клубы', value: '' },
   ...availableClubs.value.map(club => ({ label: club, value: club })),
@@ -527,7 +508,6 @@ const ageGroupOptions = computed(() => [
   ...availableAgeGroups.value.map(group => ({ label: group, value: group })),
 ])
 
-// Filtered results
 const filteredAllResults = computed(() => {
   if (!currentAllResults.value) return []
 
@@ -600,7 +580,6 @@ const filteredWomenResults = computed(() => {
   return filtered
 })
 
-// Tab configuration
 const activeTab = ref<'all' | 'men' | 'women' | 'statistics'>('all')
 const resultTabs = [
   {
@@ -634,34 +613,35 @@ const handleTabChange = (index: number) => {
   activeTab.value = resultTabs[index].key as 'all' | 'men' | 'women' | 'statistics'
 }
 
-// Methods
-const selectEvent = (event: any) => {
+const selectEvent = (event: unknown) => {
   if (event.hasResults) {
     selectedEvent.value = event
   }
 }
 
+const badgeClasses = {
+  Sprint: 'bg-blue-100 text-blue-800',
+  Olympic: 'bg-green-100 text-green-800',
+  Duathlon: 'bg-orange-100 text-orange-800',
+  Kross: 'bg-purple-100 text-purple-800',
+  HalfIronman: 'bg-red-100 text-red-800',
+  Ironman: 'bg-gray-100 text-gray-800',
+}
+
 const getCategoryBadgeClass = (category: string) => {
-  const classes = {
-    Sprint: 'bg-blue-100 text-blue-800',
-    Olympic: 'bg-green-100 text-green-800',
-    Duathlon: 'bg-orange-100 text-orange-800',
-    Kross: 'bg-purple-100 text-purple-800',
-    HalfIronman: 'bg-red-100 text-red-800',
-    Ironman: 'bg-gray-100 text-gray-800',
-  }
-  return `${classes[category] || 'bg-gray-100 text-gray-800'} text-xs font-medium px-2.5 py-0.5 rounded`
+  return `${badgeClasses[category] || 'bg-gray-100 text-gray-800'} text-xs font-medium px-2.5 py-0.5 rounded`
+}
+
+const translations = {
+  Sprint: 'Спринт',
+  Olympic: 'Олимпийка',
+  Duathlon: 'Дуатлон',
+  Kross: 'Кросс',
+  HalfIronman: 'Ironman 70.3',
+  Ironman: 'Ironman',
 }
 
 const translateCategory = (category: string) => {
-  const translations = {
-    Sprint: 'Спринт',
-    Olympic: 'Олимпийка',
-    Duathlon: 'Дуатлон',
-    Kross: 'Кросс',
-    HalfIronman: 'Ironman 70.3',
-    Ironman: 'Ironman',
-  }
   return translations[category] || category
 }
 
@@ -686,8 +666,7 @@ const formatEventDate = (startDate: string, endDate: string) => {
   }
 }
 
-// Show result details in drawer
-const showResultDetails = (result: any) => {
+const showResultDetails = (result: unknown) => {
   selectedResult.value = result
   showDetailsDrawer.value = true
 }

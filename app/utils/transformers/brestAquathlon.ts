@@ -1,11 +1,8 @@
 import { timeToSeconds } from './shared'
 import type { EventResult } from './shared'
 
-// п/п,Фамилия Имя,Команда,Г.р.,Номер,Плав,Т1,Бег,Время,Место,Прим.
-
-// Transformer for brestAquathlon format (Aquathlon: Swim + Run)
-export default function transformBrestAquathlon(data: any[]): EventResult[] {
-  return data.map((row, index) => ({
+export default function transformBrestAquathlon(data: unknown[]): EventResult[] {
+  return data.map(row => ({
     nickname: row['Фамилия Имя'],
     club: row['Команда'],
     birthYear: row['Год рождения'] ? parseInt(row['Год рождения']) : undefined,

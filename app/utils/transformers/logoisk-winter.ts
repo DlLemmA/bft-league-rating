@@ -1,8 +1,8 @@
 import { timeToSeconds } from './shared'
 import type { EventResult } from './shared'
 
-export default function transformLogoiskWinter(data: any[]): EventResult[] {
-  return data.map((row, index) => ({
+export default function transformLogoiskWinter(data: unknown[]): EventResult[] {
+  return data.map(row => ({
     nickname: row['Фамилия Имя'],
     club: row['Команда'],
     birthYear: row['Г.р.'] ? parseInt(row['Г.р.']) : undefined,

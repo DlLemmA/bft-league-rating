@@ -4,21 +4,14 @@ import { transformerMap } from '~/utils/transformers'
 import type { EventResult } from '~/utils/transformers/shared'
 import { findMatchingLicense, calculatePoints } from '~/utils/transformers/shared'
 
-/**
- * Calculate age group places for results if age group data is available
- * Top 3 athletes in each gender category are excluded from age group rankings
- */
-function calculateAgeGroupPlaces(results: any[]): any[] {
-  // Check if the first result has age group data
+function calculateAgeGroupPlaces(results: unknown[]): unknown[] {
   if (!results.length || !results[0].ageGroup) {
     return results
   }
 
-  // Group results by age group, excluding top 3 athletes in each gender category
-  const ageGroups: Record<string, any[]> = {}
+  const ageGroups: Record<string, unknown[]> = {}
 
   results.forEach((result) => {
-    // Skip top 3 athletes in their gender category for age group calculations
     if (result.ageGroup && result.genderAbsolutePlace && result.genderAbsolutePlace > 3) {
       if (!ageGroups[result.ageGroup]) {
         ageGroups[result.ageGroup] = []
@@ -27,7 +20,6 @@ function calculateAgeGroupPlaces(results: any[]): any[] {
     }
   })
 
-  // Sort each age group by total time and assign places
   Object.keys(ageGroups).forEach((group) => {
     ageGroups[group].sort((a, b) => a.totalTimeSeconds - b.totalTimeSeconds)
 
@@ -39,7 +31,7 @@ function calculateAgeGroupPlaces(results: any[]): any[] {
   return results
 }
 
-const applyTransformer = (rawResults: any[], readerType: string): EventResult[] => {
+const applyTransformer = (rawResults: unknown[], readerType: string): EventResult[] => {
   const transformer = transformerMap[readerType as keyof typeof transformerMap]
 
   if (!transformer) {
@@ -62,7 +54,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Query competition, licenses, results data, and name mapping
   const [competition, licensesData, resultsData, nameMappingData, competitionPointsData] = await Promise.all([
     queryCollection(event, 'competitions').where('stem', '=', `${year}/competitions/${slug}`).first(),
     queryCollection(event, 'licenses').where('stem', 'LIKE', `${year}%`).first(),
@@ -78,11 +69,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Process results if available
   const licenses = licensesData?.body?.map(transformLicense) || []
   const nameMapping = nameMappingData?.body.map(transformNameMapping) || []
 
-  // For multi-event competitions, enrich with results data
   if (Array.isArray(competition.events) && competition.events.length > 0) {
     const enrichedEvents = competition.events.map((event) => {
       const eventSlug = `${competition.slug}-${event.slug}`
@@ -105,7 +94,6 @@ export default defineEventHandler(async (event) => {
           gender: resultData.stem.includes('women') ? 'female' : 'male',
           genderAbsolutePlace: index + 1,
           points: result.hasLicense ? calculatePoints(result.totalTimeSeconds, licensedChampion!.totalTimeSeconds, event.points) : undefined,
-          // Add calculation data for points breakdown
           calculationData: result.hasLicense && licensedChampion
             ? {
                 basePoints: event.points,
@@ -120,7 +108,6 @@ export default defineEventHandler(async (event) => {
         absolutePlace: index + 1,
       }))
 
-      // Calculate age group places if age group data is available
       const eventResultsWithAgeGroups = calculateAgeGroupPlaces(eventResults)
 
       const participantsAmount = eventResultsWithAgeGroups.length
@@ -166,7 +153,6 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // For single event competitions, process results
   const eventResults = resultsData.flatMap((resultData) => {
     const results = applyTransformer(resultData.body, competition.readerType)
     const resultsWithLicenses = results.map((result) => {
@@ -184,7 +170,6 @@ export default defineEventHandler(async (event) => {
       gender: resultData.stem.includes('women') ? 'female' : 'male',
       genderAbsolutePlace: index + 1,
       points: result.hasLicense ? calculatePoints(result.totalTimeSeconds, licensedChampion!.totalTimeSeconds, competition.points) : undefined,
-      // Add calculation data for points breakdown
       calculationData: result.hasLicense && licensedChampion
         ? {
             basePoints: competition.points,
@@ -199,7 +184,6 @@ export default defineEventHandler(async (event) => {
     absolutePlace: index + 1,
   }))
 
-  // Calculate age group places if age group data is available
   const eventResultsWithAgeGroups = calculateAgeGroupPlaces(eventResults)
 
   const participantsAmount = eventResultsWithAgeGroups.length

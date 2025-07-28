@@ -1,7 +1,7 @@
 import { timeToSeconds } from './shared'
 import type { EventResult } from './shared'
 
-export default function transformObelarus(data: any[]): EventResult[] {
+export default function transformObelarus(data: unknown[]): EventResult[] {
   return data.map(row => ({
     nickname: row['Фамилия Имя'],
     club: row['Команда'],

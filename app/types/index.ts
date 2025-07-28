@@ -44,13 +44,6 @@ export interface EventResult {
   }>
 }
 
-export interface RatingStatistics {
-  total: number
-  men: number
-  women: number
-  competitions: number
-}
-
 export enum EventCategory {
   Sprint = 'Sprint',
   Olympic = 'Olympic',
@@ -65,14 +58,4 @@ export interface EventPoints {
   eventName: string
   eventCategory: EventCategory
   points?: number
-}
-
-export interface RatingRow {
-  place: number
-  trend: number
-  license: License
-  placeAG?: number
-  eventsPoints: EventPoints[]
-  totalPoints: number
-  theBestTrend: boolean
 }

@@ -1,10 +1,7 @@
-import { timeToSeconds, addCalculatedFields } from './shared'
+import { timeToSeconds } from './shared'
 import type { EventResult } from './shared'
 
-// МЕСТО АБСОЛЮТ ,ИМЯ ФАМИЛИЯ,КОМАНДА,ГРУППА,РЕЗУЛЬТАТ,Swim ,T1 ,Bike ,T2 ,Run ,МЕСТО М/Ж,МЕСТО ГРУППА,НОМЕР
-
-// Transformer for mogilev format (Classic Triathlon)
-export default function transformMogilev(data: any[]): EventResult[] {
+export default function transformMogilev(data: unknown[]): EventResult[] {
   return data.map(row => ({
     number: row['Номер'],
     nickname: row['ИМЯ ФАМИЛИЯ'],

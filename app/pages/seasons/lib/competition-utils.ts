@@ -1,4 +1,6 @@
-export const hasMultipleEvents = (competition: any) => {
+import type { SeasonInfo } from "~/types/seasonInfo"
+
+export const hasMultipleEvents = (competition: SeasonInfo['competitions'][number]) => {
   return competition && competition.events && competition.events.length > 0
 }
 
@@ -51,30 +53,25 @@ export const formatDateRange = (startDate: string, endDate: string) => {
 
   const end = new Date(endDate)
 
-  // If same month and year
   if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
     return `${start.getDate()} - ${end.getDate()} ${new Intl.DateTimeFormat('ru-RU', { month: 'long' }).format(end)} ${end.getFullYear()}`
   }
 
-  // If same year but different months
   if (start.getFullYear() === end.getFullYear()) {
     return `${start.getDate()} ${new Intl.DateTimeFormat('ru-RU', { month: 'long' }).format(start)} - ${end.getDate()} ${new Intl.DateTimeFormat('ru-RU', { month: 'long' }).format(end)} ${end.getFullYear()}`
   }
 
-  // Different years
   return `${formatDate(startDate)} - ${formatDate(endDate)}`
 }
 
-export const sortedCompetitions = (competitions: any[]) => {
+export const sortedCompetitions = (competitions: SeasonInfo['competitions']) => {
   if (!competitions) return []
 
   return [...competitions].sort((a, b) => {
-    // Sort by date if available
     if (a.startDate && b.startDate) {
       return new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
     }
 
-    // Fall back to title sort
     return a.title.localeCompare(b.title)
   })
 }
@@ -87,6 +84,5 @@ export const isUpcoming = (dateString: string) => {
   const timeDiff = competitionDate.getTime() - now.getTime()
   const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24))
 
-  // Consider upcoming if within next 30 days
   return daysDiff > 0 && daysDiff <= 30
 }

@@ -9,7 +9,6 @@
     </h3>
 
     <div class="grid grid-cols-1 md:grid-cols-1 gap-6 mb-8">
-      <!-- Time Statistics -->
       <div class="bg-white rounded-lg shadow p-6">
         <h4 class="text-lg font-semibold mb-4 flex items-center">
           <UIcon
@@ -51,7 +50,6 @@
       </div>
     </div>
 
-    <!-- Stage Statistics -->
     <StageStatistics :results="results" />
   </div>
 </template>
@@ -69,12 +67,10 @@ interface Statistics {
 
 interface Props {
   statistics: Statistics
-  results: any[]
+  results: unknown[]
 }
 
 const props = defineProps<Props>()
-
-// Computed properties
 
 const bestTime = computed((): string => {
   if (!props.results || props.results.length === 0) return '—'
@@ -96,7 +92,6 @@ const averageTime = computed((): string => {
   const totalSeconds = validResults.reduce((sum, result) => sum + result.totalTimeSeconds, 0)
   const averageSeconds = totalSeconds / validResults.length
 
-  // Format seconds to time string (HH:MM:SS)
   const hours = Math.floor(averageSeconds / 3600)
   const minutes = Math.floor((averageSeconds % 3600) / 60)
   const seconds = Math.floor(averageSeconds % 60)
@@ -115,10 +110,8 @@ const medianTime = computed((): string => {
   const validResults = props.results.filter(r => typeof r.totalTimeSeconds === 'number')
   if (validResults.length === 0) return '—'
 
-  // Sort by time
   const sortedTimes = [...validResults].sort((a, b) => a.totalTimeSeconds - b.totalTimeSeconds)
 
-  // Get median
   const mid = Math.floor(sortedTimes.length / 2)
   const medianResult = sortedTimes.length % 2 === 0
     ? sortedTimes[mid - 1]

@@ -1,8 +1,7 @@
 import { timeToSeconds } from './shared'
 import type { EventResult } from './shared'
 
-// Transformer for zaslavl format (Multitriathlon with generic stages)
-export default function transformZaslavl(data: any[]): EventResult[] {
+export default function transformZaslavl(data: unknown[]): EventResult[] {
   return data.map(row => ({
     nickname: row['Участник'],
     club: row['Команда'],

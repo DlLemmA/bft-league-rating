@@ -4,11 +4,11 @@
     class="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200 hover:border-blue-300 active:scale-[0.98] block h-full min-h-[200px]"
   >
 
-    <!-- Mobile-optimized card layout with consistent height -->
     <div class="p-4 h-full flex flex-col min-h-[200px]">
-      <!-- Header: Title and Status -->
       <div class="flex items-start justify-between mb-3">
-        <h4 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors leading-tight flex-1 pr-2">
+        <h4
+          class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors leading-tight flex-1 pr-2"
+        >
           {{ competition.title }}
         </h4>
         <div class="flex-shrink-0">
@@ -33,7 +33,6 @@
         </div>
       </div>
 
-      <!-- Key Info Row -->
       <div class="flex items-center justify-between mb-3 text-sm">
         <div class="flex items-center text-gray-600">
           <UIcon
@@ -53,7 +52,6 @@
         </div>
       </div>
 
-      <!-- Category and Points Row -->
       <div class="flex items-center justify-between mb-3">
         <div class="flex-1">
           <span
@@ -72,7 +70,7 @@
               class="mr-1"
               size="14"
             />
-            {{ competition.events.length }} дисциплин
+            дисциплины
           </span>
         </div>
 
@@ -89,9 +87,7 @@
         </div>
       </div>
 
-      <!-- Content area that grows to fill space -->
       <div class="flex-1 flex flex-col">
-        <!-- Multi-event preview (fixed height) -->
         <div
           v-if="hasMultipleEvents(competition)"
           class="border-t border-gray-100 pt-3 mb-3 flex-1"
@@ -140,14 +136,12 @@
           </div>
         </div>
 
-        <!-- Spacer for single events to maintain consistent height -->
         <div
           v-else
           class="flex-1 min-h-[4rem]"
         />
       </div>
 
-      <!-- Action indicator (always at bottom) -->
       <div class="flex items-center justify-between pt-3 mt-auto border-t border-gray-100">
         <span class="text-sm text-gray-500">
           {{ competition.hasResults ? 'Результаты доступны' : 'Нажмите для просмотра' }}
@@ -172,7 +166,7 @@ import {
 } from '../lib/competition-utils'
 
 interface Props {
-  competition: any
+  competition: unknown
   year: string | number
 }
 

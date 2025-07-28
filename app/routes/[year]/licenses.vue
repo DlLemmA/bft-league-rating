@@ -6,7 +6,6 @@
 const route = useRoute()
 const year = route.params.year as string
 
-// Page metadata - mobile optimized title
 useHead({
   title: `Лицензии ${year}`,
   meta: [

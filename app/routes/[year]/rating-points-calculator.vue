@@ -1,19 +1,15 @@
 <template>
   <div class="container mx-auto px-4 py-8">
     <div class="mb-8">
-      <!-- Breadcrumb navigation -->
       <UBreadcrumb
         class="mb-4"
         :items="breadcrumbLinks"
       />
 
-      <!-- Page title with mobile optimization -->
       <h1 class="text-4xl md:text-4xl font-bold mb-2">
-        <span class="hidden sm:inline">Калькулятор рейтинга {{ year }}</span>
-        <span class="sm:hidden">Калькулятор рейтинга</span>
+        Калькулятор рейтинга {{ year }}
       </h1>
 
-      <!-- Pre-filled data indicator -->
       <div
         v-if="isPreFilled"
         class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg"
@@ -55,7 +51,6 @@
         </div>
 
         <div class="col-span-1 md:col-span-4 mt-6 space-y-6">
-          <!-- Quick result - more prominent -->
           <div class="p-6 bg-amber-50 rounded-lg border border-amber-200 shadow-sm">
             <div class="text-center">
               <div class="text-sm text-amber-800 mb-3">
@@ -70,13 +65,11 @@
             </div>
           </div>
 
-          <!-- Detailed calculation steps -->
           <div class="bg-white rounded-lg border border-gray-200 p-6">
             <div class="text-lg font-medium text-gray-800 mb-4">
               Пошаговый расчет:
             </div>
 
-            <!-- Step 1: Priority categories -->
             <div class="bg-gray-50 rounded p-4 border border-gray-200 mb-4">
               <div class="text-sm text-gray-600 mb-3 font-medium">
                 Шаг 1: Лучшие результаты по приоритетным категориям
@@ -98,10 +91,6 @@
                   <span><strong>К</strong>росс:</span>
                   <span class="font-mono">{{ calculatedResults.kross }}</span>
                 </div>
-                <div class="flex justify-between items-center">
-                  <span><strong>З</strong>имний дуатлон:</span>
-                  <span class="font-mono">{{ calculatedResults.winterDuathlon }}</span>
-                </div>
                 <div class="border-t border-gray-300 pt-2 mt-2">
                   <div class="flex justify-between items-center font-medium">
                     <span>Сумма приоритетных:</span>
@@ -111,7 +100,6 @@
               </div>
             </div>
 
-            <!-- Step 2: Other events -->
             <div class="bg-gray-50 rounded p-4 border border-gray-200 mb-4">
               <div class="text-sm text-gray-600 mb-3 font-medium">
                 Шаг 2: Лучшие 4 результата из остальных соревнований
@@ -140,7 +128,6 @@
               </div>
             </div>
 
-            <!-- Step 3: Final calculation -->
             <div class="bg-amber-100 rounded p-4 border border-amber-300">
               <div class="text-sm text-amber-700 mb-3 font-medium">
                 Шаг 3: Итоговый результат
@@ -154,7 +141,6 @@
         </div>
       </form>
 
-      <!-- Collapsible Formula Image Section -->
       <div class="mt-6 border-t border-gray-200 pt-6">
         <UButton
           variant="ghost"
@@ -215,7 +201,6 @@ import { useUrlSearchParams } from '@vueuse/core'
 const route = useRoute()
 const year = route.params.year as string
 
-// Breadcrumb navigation
 const breadcrumbLinks = [
   {
     label: 'Главная',
@@ -228,7 +213,6 @@ const breadcrumbLinks = [
   },
 ]
 
-// Page metadata - mobile optimized title
 useHead({
   title: `Калькулятор рейтинга ${year}`,
   meta: [
@@ -236,33 +220,29 @@ useHead({
   ],
 })
 
-// Load competition points data and competitions
 const { data: competitionPointsData } = await useFetch(`/api/${year}/competition-points`)
 const { data: competitionsData } = await useAsyncData('competitions', () => {
   return queryCollection('competitions').where('stem', 'LIKE', `${year}%`).all()
 })
 
-// Extract base points for each category
 const basePoints = computed(() => {
   const points: Record<string, number> = {}
   const categories = competitionPointsData.value?.categories || competitionPointsData.value?.body?.categories
   if (categories) {
-    Object.entries(categories).forEach(([key, category]: [string, any]) => {
+    Object.entries(categories).forEach(([key, category]: [string, unknown]) => {
       points[key] = category.basePoints
     })
   }
   return points
 })
 
-// Generate events from competitions data
 const events = computed(() => {
   const eventsMap: Record<string, { name: string, category: string, maxPoints: number }> = {}
 
   if (competitionsData.value) {
-    competitionsData.value.forEach((competition: any) => {
+    competitionsData.value.forEach((competition) => {
       if (competition.events && Array.isArray(competition.events)) {
-        // Multi-event competition
-        competition.events.forEach((event: any) => {
+        competition.events.forEach((event) => {
           const eventKey = `${competition.slug}-${event.slug}`
           eventsMap[eventKey] = {
             name: `${competition.title} - ${event.title}`,
@@ -272,7 +252,6 @@ const events = computed(() => {
         })
       }
       else {
-        // Single event competition
         eventsMap[competition.slug] = {
           name: competition.title,
           category: competition.category,
@@ -285,21 +264,16 @@ const events = computed(() => {
   return eventsMap
 })
 
-// Prioritized categories for rating calculation
 const prioritisedCategories = ['Sprint', 'Olympic', 'Duathlon', 'Kross']
 
-// Reactive state for event points
 const eventPoints = ref<Record<string, number | null>>({})
 const userHasModifiedData = ref(false)
 const showFormula = ref(false)
 
-// URL parameters using VueUse
 const urlParams = useUrlSearchParams('history')
 
-// Track initial values to detect user modifications
 const initialEventPoints = ref<Record<string, number | null>>({})
 
-// Initialize event points from URL query parameters
 onMounted(() => {
   let hasPrefilledData = false
 
@@ -314,17 +288,14 @@ onMounted(() => {
     }
   })
 
-  // Store initial values after URL parameters are processed
   nextTick(() => {
     initialEventPoints.value = { ...eventPoints.value }
   })
 
-  // Check for scala total value for validation
   const scalaTotalValue = urlParams.scalaTotalValue
   if (scalaTotalValue) {
     const parsedValue = parseFloat(scalaTotalValue as string)
     if (!isNaN(parsedValue)) {
-      // Compare with calculated total
       const calculatedTotal = calculateTotalPoints().total
       const roundedResult = Math.round(calculatedTotal * 100) / 100
 
@@ -341,7 +312,6 @@ onMounted(() => {
     }
   }
 
-  // Show notification if data was pre-filled
   if (hasPrefilledData) {
     const toast = useToast()
     toast.add({
@@ -354,9 +324,7 @@ onMounted(() => {
   }
 })
 
-// Watch for user modifications to hide pre-filled indicator
 watch(eventPoints, () => {
-  // Only mark as modified if we had pre-filled data and values have actually changed
   if (Object.keys(urlParams).some(key => key !== 'scalaTotalValue') && !userHasModifiedData.value) {
     const hasChanged = JSON.stringify(eventPoints.value) !== JSON.stringify(initialEventPoints.value)
 
@@ -366,14 +334,11 @@ watch(eventPoints, () => {
   }
 }, { deep: true })
 
-// Check if data was pre-filled from URL parameters and user hasn't modified it
 const isPreFilled = computed(() => {
   return Object.keys(urlParams).some(key => key !== 'scalaTotalValue') && !userHasModifiedData.value
 })
 
-// Calculate total points based on current event points
 function calculateTotalPoints() {
-  // Find maximum points for each prioritized category
   const categoryMax: Record<string, { eventId: string, points: number, name: string }> = {}
 
   Object.entries(events.value).forEach(([eventId, event]) => {
@@ -391,7 +356,6 @@ function calculateTotalPoints() {
     }
   })
 
-  // Find other events (not in prioritized categories or not the max in their category)
   const otherEvents: { eventId: string, points: number, name: string }[] = []
 
   Object.entries(events.value).forEach(([eventId, event]) => {
@@ -411,12 +375,10 @@ function calculateTotalPoints() {
     }
   })
 
-  // Sort other events by points and take top 4
   const topOtherEvents = otherEvents
     .sort((a, b) => b.points - a.points)
     .slice(0, 4)
 
-  // Calculate total points
   const prioritizedTotal = Object.values(categoryMax).reduce((sum, item) => sum + item.points, 0)
   const otherTotal = topOtherEvents.reduce((sum, item) => sum + item.points, 0)
   const total = prioritizedTotal + otherTotal
@@ -441,6 +403,5 @@ function calculateTotalPoints() {
   }
 }
 
-// Computed results
 const calculatedResults = computed(() => calculateTotalPoints())
 </script>

@@ -1,6 +1,8 @@
-import competitionPoints from './[year]/competition-points'
+import type { ResultsCollectionItem } from '@nuxt/content'
+import type { SeasonInfo } from '~/types/seasonInfo';
 
-// Extract competition metadata from result stem
+
+
 const extractCompetitionMetaFromStem = (stem: string): { year: string, slug: string } => {
   // Format: "2025/results/braslav-kross/men"
   const parts = stem.split('/')
@@ -10,7 +12,7 @@ const extractCompetitionMetaFromStem = (stem: string): { year: string, slug: str
   return { year, slug }
 }
 
-const calculateGenderStatistics = (resultFiles: any[]) => {
+const calculateGenderStatistics = (resultFiles: ResultsCollectionItem[]) => {
   let menCount = 0
   let womenCount = 0
 
@@ -30,21 +32,18 @@ const calculateGenderStatistics = (resultFiles: any[]) => {
 }
 
 export default defineEventHandler(async (event) => {
-  // Query all competitions and results at once
   const [competitions, allResults, competitionsPointsData] = await Promise.all([
     queryCollection(event, 'competitions').all(),
     queryCollection(event, 'results').all(),
     queryCollection(event, 'competitionPoints').all(),
   ])
 
-  // Group results by competition slug for faster lookup
-  const resultsByCompetition: Record<string, any[]> = {}
+  const resultsByCompetition: Record<string, ResultsCollectionItem[]> = {}
 
   allResults.forEach((result) => {
     const { year, slug } = extractCompetitionMetaFromStem(result.stem)
 
     if (slug) {
-      // Create keys for both the full competition and individual events
       const yearCompKey = `${year}/${slug}`
 
       if (!resultsByCompetition[yearCompKey]) {
@@ -52,9 +51,8 @@ export default defineEventHandler(async (event) => {
       }
       resultsByCompetition[yearCompKey].push(result)
 
-      // Handle multi-event competitions (if slug contains a hyphen)
       if (slug.includes('-')) {
-        const [mainSlug, eventSlug] = slug.split('-')
+        const [mainSlug] = slug.split('-')
         const mainCompKey = `${year}/${mainSlug}`
 
         if (!resultsByCompetition[mainCompKey]) {
@@ -65,13 +63,12 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  const enrichedCompetitions = competitions.map((competition: any) => {
+  const enrichedCompetitions = competitions.map((competition) => {
     const { year: competitionYear } = extractCompetitionMetaFromStem(competition.stem)
     const competitionKey = `${competitionYear}/${competition.slug}`
 
     if (Array.isArray(competition.events)) {
-      // Multi-event competition
-      const enrichedEvents = competition.events.map((eventInfo: any) => {
+      const enrichedEvents = competition.events.map((eventInfo) => {
         const eventKey = `${competitionYear}/${competition.slug}-${eventInfo.slug}`
         const eventResults = resultsByCompetition[eventKey] || []
         const stats = calculateGenderStatistics(eventResults)
@@ -83,14 +80,13 @@ export default defineEventHandler(async (event) => {
 
         return {
           ...eventInfo,
-          points: pointsInfo.body.categories[eventInfo.category].basePoints,
+          points: pointsInfo?.body.categories[eventInfo.category].basePoints,
           participantCount: stats.all,
           statistics: stats,
           hasResults,
         }
       })
 
-      // Aggregate statistics across all events
       const totalStats = enrichedEvents.reduce(
         (acc, event) => ({
           all: acc.all + event.statistics.all,
@@ -109,7 +105,6 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Single event competition
     const competitionResults = resultsByCompetition[competitionKey] || []
     const statistics = calculateGenderStatistics(competitionResults)
     const hasResults = competitionResults.length > 0
@@ -120,26 +115,15 @@ export default defineEventHandler(async (event) => {
 
     return {
       ...competition,
-      points: pointsInfo.body.categories[competition.category].basePoints,
+      points: pointsInfo?.body.categories[competition.category!].basePoints,
       year: competitionYear,
       statistics,
       hasResults,
     }
   })
 
-  // Group competitions by year
-  const seasonsByYear: Record<string, {
-    statistics: {
-      all: number
-      men: number
-      women: number
-      competitionsCount: number
-      competitionsWithResults: number
-    }
-    competitions: any[]
-  }> = {}
+  const seasonsByYear: Record<string, SeasonInfo> = {}
 
-  // Process enriched competitions and group by year
   enrichedCompetitions.forEach((competition) => {
     const year = competition.year
 
@@ -156,10 +140,8 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Add competition to the year's competitions array
     seasonsByYear[year].competitions.push(competition)
 
-    // Update year statistics
     seasonsByYear[year].statistics.all += competition.statistics.all
     seasonsByYear[year].statistics.men += competition.statistics.men
     seasonsByYear[year].statistics.women += competition.statistics.women

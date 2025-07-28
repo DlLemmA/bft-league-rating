@@ -1,10 +1,7 @@
 import { timeToSeconds } from './shared'
 import type { EventResult } from './shared'
 
-// Место,Участник,Команда,Группа,Результат,Плавание,T1 ,Вело,T2,Бег,Место м/ж,Место группа,BIB
-
-// Transformer for athlinks format (International format)
-export default function transformAthlinks(data: any[]): EventResult[] {
+export default function transformAthlinks(data: unknown[]): EventResult[] {
   return data.map(row => ({
     nickname: row['Участник'],
     club: row['Команда'].split(',')[0].trim(),

@@ -70,16 +70,13 @@
           </div>
         </div>
 
-        <!-- Points and Places Section -->
         <div class="bg-blue-50 rounded-lg p-4 mb-6 border border-blue-100">
           <div class="text-xl font-bold text-blue-700 flex items-center justify-between mb-4">
             <span>Итоговые очки:</span>
             <span>{{ formatPoints(athlete.totalPoints) }}</span>
           </div>
 
-          <!-- Places Grid -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <!-- Absolute Place -->
             <div
               :class="[
                 'text-center p-3 rounded-lg',
@@ -89,10 +86,11 @@
               <div class="text-xs text-gray-500 mb-1 font-medium">
                 Общий рейтинг
               </div>
-              <div :class="getBestPlaceType(athlete) === 'absolute' ? 'text-yellow-700 font-bold text-lg' : 'text-gray-700 text-lg'">
+              <div
+                :class="getBestPlaceType(athlete) === 'absolute' ? 'text-yellow-700 font-bold text-lg' : 'text-gray-700 text-lg'"
+              >
                 {{ athlete.absolutePlace || '—' }}
               </div>
-              <!-- Trend for absolute place -->
               <div
                 v-if="athlete.previousAbsolutePlace && athlete.absolutePlace"
                 class="text-xs mt-2"
@@ -118,7 +116,6 @@
               </div>
             </div>
 
-            <!-- Gender Place -->
             <div
               :class="[
                 'text-center p-3 rounded-lg',
@@ -128,7 +125,9 @@
               <div class="text-xs text-gray-500 mb-1 font-medium">
                 {{ athlete.gender === 'Мужской' ? 'Среди мужчин' : 'Среди женщин' }}
               </div>
-              <div :class="getBestPlaceType(athlete) === 'gender' ? (athlete.gender === 'Мужской' ? 'text-blue-700 font-bold text-lg' : 'text-pink-700 font-bold text-lg') : 'text-gray-700 text-lg'">
+              <div
+                :class="getBestPlaceType(athlete) === 'gender' ? (athlete.gender === 'Мужской' ? 'text-blue-700 font-bold text-lg' : 'text-pink-700 font-bold text-lg') : 'text-gray-700 text-lg'"
+              >
                 <span
                   v-if="athlete.genderPlace <= 3"
                   class="mr-1"
@@ -137,7 +136,6 @@
                 </span>
                 {{ athlete.genderPlace || '—' }}
               </div>
-              <!-- Trend for gender place -->
               <div
                 v-if="athlete.previousGenderPlace && athlete.genderPlace"
                 class="text-xs mt-2"
@@ -163,7 +161,6 @@
               </div>
             </div>
 
-            <!-- Age Group Place -->
             <div
               :class="[
                 'text-center p-3 rounded-lg',
@@ -173,7 +170,9 @@
               <div class="text-xs text-gray-500 mb-1 font-medium">
                 {{ athlete.ageGroup || 'Возрастная группа' }}
               </div>
-              <div :class="getBestPlaceType(athlete) === 'ageGroup' ? 'text-purple-700 font-bold text-lg' : 'text-gray-700 text-lg'">
+              <div
+                :class="getBestPlaceType(athlete) === 'ageGroup' ? 'text-purple-700 font-bold text-lg' : 'text-gray-700 text-lg'"
+              >
                 <span
                   v-if="athlete.ageGroupPlace <= 3"
                   class="mr-1"
@@ -182,7 +181,6 @@
                 </span>
                 {{ athlete.ageGroupPlace || '—' }}
               </div>
-              <!-- Trend for age group place -->
               <div
                 v-if="athlete.previousAgeGroupPlace && athlete.ageGroupPlace"
                 class="text-xs mt-2"
@@ -211,7 +209,6 @@
         </div>
 
         <div class="space-y-4">
-          <!-- Prioritized categories -->
           <div class="bg-gray-50 rounded-md p-4 border border-gray-200">
             <h3 class="font-bold text-lg mb-3">
               Лучшие результаты по категориям:
@@ -276,7 +273,6 @@
             </div>
           </div>
 
-          <!-- Other events -->
           <div class="bg-gray-50 rounded-md p-4 border border-gray-200">
             <h3 class="font-bold text-lg mb-3">
               Лучшие 4 других результата:
@@ -310,7 +306,6 @@
             </div>
           </div>
 
-          <!-- All competitions -->
           <div
             v-if="athlete.competitions && athlete.competitions.length > 0"
             class="mt-6"
@@ -392,21 +387,11 @@ const props = defineProps<{
   athlete: License
 }>()
 
-// Prioritized categories
-const prioritizedCategories = [
-  EventCategory.Sprint,
-  EventCategory.Olympic,
-  EventCategory.Duathlon,
-  EventCategory.Kross,
-]
-
-// Sort competitions by points
 const sortedCompetitions = computed(() => {
   if (!props.athlete.competitions) return []
   return [...props.athlete.competitions].sort((a, b) => b.points - a.points)
 })
 
-// Get best result for each prioritized category
 const bestResults = computed(() => {
   const results = {
     sprint: null as CompetitionResult | null,
@@ -435,12 +420,10 @@ const bestResults = computed(() => {
   return results
 })
 
-// Get other top results (not in prioritized categories or not the best in their category)
 const otherResults = computed(() => {
   if (!props.athlete?.competitions) return []
 
   const otherComps = props.athlete.competitions.filter((comp) => {
-    // Skip if it's one of the best results in prioritized categories
     if (comp === bestResults.value.sprint
       || comp === bestResults.value.olympic
       || comp === bestResults.value.duathlon
@@ -451,13 +434,10 @@ const otherResults = computed(() => {
     return true
   })
 
-  // Sort by points and take top 4
   return otherComps.sort((a, b) => b.points - a.points).slice(0, 4)
 })
 
-// Check if a competition is counted in the total points
 const isCountedCompetition = (comp: CompetitionResult) => {
-  // Check if it's one of the best results in prioritized categories
   if (comp === bestResults.value.sprint
     || comp === bestResults.value.olympic
     || comp === bestResults.value.duathlon
@@ -465,11 +445,9 @@ const isCountedCompetition = (comp: CompetitionResult) => {
     return true
   }
 
-  // Check if it's one of the top 4 other results
   return otherResults.value.includes(comp)
 }
 
-// Get category label
 const getCategoryLabel = (category: EventCategory) => {
   const labels = {
     [EventCategory.Sprint]: 'Спринт',
@@ -483,7 +461,6 @@ const getCategoryLabel = (category: EventCategory) => {
   return labels[category] || category
 }
 
-// Get category badge class
 const getCategoryBadgeClass = (category: EventCategory) => {
   const classes = {
     [EventCategory.Sprint]: 'bg-blue-100 text-blue-800',
@@ -497,13 +474,11 @@ const getCategoryBadgeClass = (category: EventCategory) => {
   return `${classes[category] || 'bg-gray-100 text-gray-800'} text-xs font-medium px-2.5 py-0.5 rounded`
 }
 
-// Helper method to format points
 const formatPoints = (points: number | undefined): string => {
   if (points === undefined) return '0'
   return Number.isInteger(points) ? points.toString() : points.toFixed(2)
 }
 
-// Helper method to determine the best place type
 const getBestPlaceType = (athlete: License): 'absolute' | 'gender' | 'ageGroup' | null => {
   const places = [
     { type: 'absolute' as const, place: athlete.absolutePlace },
@@ -513,10 +488,8 @@ const getBestPlaceType = (athlete: License): 'absolute' | 'gender' | 'ageGroup' 
 
   if (places.length === 0) return null
 
-  // Find the best (lowest) place
   const bestPlace = Math.min(...places.map(p => p.place))
 
-  // If gender and absolute are the same, prefer gender
   const bestPlaces = places.filter(p => p.place === bestPlace)
   if (bestPlaces.length > 1) {
     const genderPlace = bestPlaces.find(p => p.type === 'gender')

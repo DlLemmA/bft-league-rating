@@ -118,7 +118,6 @@
           </div>
         </div>
 
-        <!-- Points Summary Section -->
         <div
           v-if="result.points && result.hasLicense"
           class="bg-amber-50 rounded-lg p-4 mb-6 border border-amber-200"
@@ -143,7 +142,6 @@
             </NuxtLink>
           </div>
 
-          <!-- Quick summary -->
           <div class="bg-white rounded p-3 border border-amber-200 mb-4">
             <div class="text-sm text-amber-800 mb-2">
               Итоговый результат:
@@ -157,7 +155,6 @@
           </div>
         </div>
 
-        <!-- Stage Results -->
         <div
           v-if="result.stages && result.stages.length > 0"
           class="space-y-4"
@@ -206,7 +203,6 @@
             </div>
           </div>
 
-          <!-- Stage Statistics -->
           <div
             v-if="hasStageStatistics"
             class="bg-gray-50 rounded-md p-4 border border-gray-200"
@@ -257,7 +253,6 @@
           </div>
         </div>
 
-        <!-- No stages message -->
         <div
           v-else
           class="bg-gray-50 rounded-md p-4 border border-gray-200 text-center"
@@ -282,58 +277,54 @@ import { useMediaQuery } from '@vueuse/core'
 const isDesktop = useMediaQuery('(min-width: 768px)')
 
 const props = defineProps<{
-  result: any
+  result: unknown
 }>()
 
-// Reactive state for collapsible sections
-const showDiagram = ref(false)
-const showCalculation = ref(false)
+const emojis: Record<string, string> = {
+  swim: '🏊',
+  run: '🏃',
+  bike: '🚴',
+  transition: '🔄',
+  transition1: '🔄',
+  transition2: '🔄',
+  ski: '⛷️',
+  stage1: '1️⃣',
+  stage2: '2️⃣',
+  stage3: '3️⃣',
+}
 
-// Helper methods
 const getStageEmoji = (type: string): string => {
-  const emojis: Record<string, string> = {
-    swim: '🏊',
-    run: '🏃',
-    bike: '🚴',
-    transition: '🔄',
-    transition1: '🔄',
-    transition2: '🔄',
-    ski: '⛷️',
-    stage1: '1️⃣',
-    stage2: '2️⃣',
-    stage3: '3️⃣',
-  }
   return emojis[type] || '🏁'
 }
 
+const translations: Record<string, string> = {
+  swim: 'Плавание',
+  run: 'Бег',
+  bike: 'Велосипед',
+  transition1: 'Переход 1',
+  transition2: 'Переход 2',
+  ski: 'Лыжи',
+  stage1: 'Этап 1',
+  stage2: 'Этап 2',
+  stage3: 'Этап 3',
+}
+
 const translateStageType = (type: string): string => {
-  const translations: Record<string, string> = {
-    swim: 'Плавание',
-    run: 'Бег',
-    bike: 'Велосипед',
-    transition1: 'Переход 1',
-    transition2: 'Переход 2',
-    ski: 'Лыжи',
-    stage1: 'Этап 1',
-    stage2: 'Этап 2',
-    stage3: 'Этап 3',
-  }
   return translations[type] || type
 }
 
-// Computed properties for stage analysis
 const hasStageStatistics = computed(() => {
   return props.result?.stages && props.result.stages.length > 0
-    && props.result.stages.some((stage: any) => stage.place)
+    && props.result.stages.some((stage: unknown) => stage.place)
 })
 
 const bestStage = computed(() => {
   if (!props.result?.stages) return null
 
-  const stagesWithPlaces = props.result.stages.filter((stage: any) => stage.place)
+  const stagesWithPlaces = props.result.stages.filter((stage: unknown) => stage.place)
   if (stagesWithPlaces.length === 0) return null
 
-  return stagesWithPlaces.reduce((best: any, current: any) => {
+  return stagesWithPlaces.reduce((best: unknown, current: unknown) => {
     return !best || current.place < best.place ? current : best
   }, null)
 })
@@ -341,15 +332,14 @@ const bestStage = computed(() => {
 const worstStage = computed(() => {
   if (!props.result?.stages) return null
 
-  const stagesWithPlaces = props.result.stages.filter((stage: any) => stage.place)
+  const stagesWithPlaces = props.result.stages.filter(stage => stage.place)
   if (stagesWithPlaces.length === 0) return null
 
-  return stagesWithPlaces.reduce((worst: any, current: any) => {
+  return stagesWithPlaces.reduce((worst: unknown, current: unknown) => {
     return !worst || current.place > worst.place ? current : worst
   }, null)
 })
 
-// Points calculation computed properties
 const basePoints = computed(() => {
   return props.result?.calculationData?.basePoints || 700
 })
@@ -369,7 +359,6 @@ const timeDifference = computed(() => {
     return '00:00'
   }
 
-  // Convert seconds to time format
   const hours = Math.floor(diffSeconds / 3600)
   const minutes = Math.floor((diffSeconds % 3600) / 60)
   const seconds = Math.floor(diffSeconds % 60)
@@ -385,27 +374,22 @@ const timeDifference = computed(() => {
 const pointsCoefficient = computed(() => {
   if (!props.result?.points || !basePoints.value) return '0.000'
 
-  // Calculate the coefficient used in points calculation
   const coefficient = props.result.points / basePoints.value
   return coefficient.toFixed(3)
 })
 
-// Calculator link with pre-filled parameters
 const calculatorLink = computed(() => {
   const route = useRoute()
   const params = new URLSearchParams()
 
-  // Add winner time if available
   if (winnerTime.value && winnerTime.value !== '—') {
     params.set('winnerTime', winnerTime.value)
   }
 
-  // Add user's time
   if (props.result?.totalTime) {
     params.set('yourTime', props.result.totalTime)
   }
 
-  // Add base points
   if (basePoints.value) {
     params.set('basePoints', basePoints.value.toString())
   }
@@ -413,11 +397,4 @@ const calculatorLink = computed(() => {
   const queryString = params.toString()
   return `/${route.params.year}/distance-points-calculator${queryString ? '?' + queryString : ''}`
 })
-
-// Handle image loading errors
-const handleImageError = (event: Event) => {
-  const img = event.target as HTMLImageElement
-  img.style.display = 'none'
-  // You could show a fallback message here
-}
 </script>

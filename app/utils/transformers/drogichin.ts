@@ -1,7 +1,7 @@
 import { timeToSeconds } from './shared'
 import type { EventResult } from './shared'
 
-export default function transformDrogichin(data: any[]): EventResult[] {
+export default function transformDrogichin(data: unknown[]): EventResult[] {
   return data.map(row => ({
     nickname: row['ИМЯ ФАМИЛИЯ'],
     stages: [],

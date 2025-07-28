@@ -1,5 +1,4 @@
 <template>
-  <!-- Page Header -->
   <div class="mb-6">
     <UBreadcrumb
       :items="[
@@ -38,7 +37,6 @@
     v-else
     class="space-y-8"
   >
-    <!-- Statistics Cards (desktop only) -->
     <div class="hidden sm:block mb-6">
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatisticCard
@@ -72,7 +70,6 @@
       </div>
     </div>
 
-    <!-- Search and Filters -->
     <div class="bg-white rounded-lg border border-gray-200 p-4 mb-6">
       <h2 class="text-lg font-semibold mb-4 flex items-center sm:hidden">
         <UIcon
@@ -89,21 +86,16 @@
         Фильтры и поиск
       </h2>
 
-      <!-- Category Tabs -->
       <div class="mb-4">
         <UTabs
           :items="ratingTabs"
           :default-index="activeTabIndex"
-          @change="handleTabChange"
-        >
-          <template #content="{ item }">
-            <!-- Empty content - we'll render below -->
-          </template>
-        </UTabs>
+          :content="false"
+          @update:model-value="handleTabChange"
+        />
       </div>
 
       <div class="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-1 md:grid-cols-3 sm:gap-4">
-        <!-- Search -->
         <div class="sm:col-span-1">
           <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
             <UIcon
@@ -122,9 +114,7 @@
           />
         </div>
 
-        <!-- Filters in a row on mobile -->
         <div class="grid grid-cols-2 gap-3 sm:col-span-2 sm:grid-cols-2 sm:gap-4">
-          <!-- Club filter -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
               <UIcon
@@ -149,7 +139,6 @@
             </div>
           </div>
 
-          <!-- Age group filter -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
               <UIcon
@@ -179,11 +168,10 @@
 
     <RatingTable
       class="md:bg-white rounded-lg md:shadow-sm"
-      :athletes="getCurrentData()"
+      :athletes="displayedAthletes"
       @show-details="showAthleteDetails"
     />
 
-    <!-- Rating Details Drawer -->
     <RatingDetailsDrawer
       v-if="selectedAthlete"
       v-model:open="showDetailsDrawer"
@@ -193,10 +181,11 @@
 </template>
 
 <script setup lang="ts">
+import type { License } from '~/utils/transformers/license'
+
 const route = useRoute()
 const year = route.params.year as string
 
-// Mobile-optimized title
 useHead({
   title: `Рейтинг ${route.params.year}`,
   meta: [
@@ -206,19 +195,15 @@ useHead({
   ],
 })
 
-// Fetch rating data
 const { data: ratingData, pending, error } = await useFetch(`/api/${year}/rating`)
 
-// State for search and filters
 const searchQuery = ref('')
 const selectedClub = ref('Все клубы')
 const selectedAgeGroup = ref('Все группы')
 
-// State for competition details drawer
 const showDetailsDrawer = ref(false)
-const selectedAthlete = ref<any>(null)
+const selectedAthlete = ref<License>()
 
-// Tab configuration
 const activeTab = ref<'all' | 'men' | 'women'>('all')
 const ratingTabs = [
   {
@@ -243,24 +228,22 @@ const activeTabIndex = computed(() => {
   return index >= 0 ? index : 0
 })
 
-const handleTabChange = (index: number) => {
+const handleTabChange = (index: number | string) => {
   activeTab.value = ratingTabs[index].key as 'all' | 'men' | 'women'
 }
 
-// Computed properties
 const availableClubs = computed(() => {
   if (!ratingData.value || ratingData.value.length === 0) return []
-  const clubSet = new Set(ratingData.value.map((athlete: any) => athlete.club).filter(Boolean))
+  const clubSet = new Set(ratingData.value.map(athlete => athlete.club).filter(Boolean))
   return Array.from(clubSet).sort()
 })
 
 const availableAgeGroups = computed(() => {
   if (!ratingData.value || ratingData.value.length === 0) return []
-  const ageGroupSet = new Set(ratingData.value.map((athlete: any) => athlete.ageGroup).filter(Boolean))
+  const ageGroupSet = new Set(ratingData.value.map(athlete => athlete.ageGroup).filter(Boolean))
   return Array.from(ageGroupSet).sort()
 })
 
-// Options for USelect components
 const clubOptions = computed(() => [
   'Все клубы',
   ...availableClubs.value,
@@ -273,22 +256,21 @@ const ageGroupOptions = computed(() => [
 
 const menCount = computed(() => {
   if (!ratingData.value) return 0
-  return ratingData.value.filter((athlete: any) => athlete.gender === 'Мужской').length
+  return ratingData.value.filter(athlete => athlete.gender === 'Мужской').length
 })
 
 const womenCount = computed(() => {
   if (!ratingData.value) return 0
-  return ratingData.value.filter((athlete: any) => athlete.gender === 'Женский').length
+  return ratingData.value.filter(athlete => athlete.gender === 'Женский').length
 })
 
 const competitionsCount = computed(() => {
   if (!ratingData.value || ratingData.value.length === 0) return 0
 
-  // Get unique competition names
   const competitionSet = new Set()
-  ratingData.value.forEach((athlete: any) => {
+  ratingData.value.forEach((athlete) => {
     if (athlete.competitions) {
-      athlete.competitions.forEach((comp: any) => {
+      athlete.competitions.forEach((comp) => {
         competitionSet.add(comp.competition)
       })
     }
@@ -306,151 +288,37 @@ const ratingStatistics = computed(() => {
   }
 })
 
-// Places are now calculated in the API
-
-// Filtered data for all athletes
-const filteredRatingData = computed(() => {
+const displayedAthletes = computed(() => {
   if (!ratingData.value) return []
 
-  let filtered = ratingData.value
+  const query = searchQuery.value.toLowerCase()
 
-  // Filter by search query
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter((athlete: any) =>
-      athlete.fioRussian.toLowerCase().includes(query)
-      || athlete.fioEnglish.toLowerCase().includes(query),
-    )
-  }
+  return ratingData.value.filter((athlete) => {
+    let isShown = true
 
-  // Filter by club
-  if (selectedClub.value && selectedClub.value !== 'Все клубы') {
-    filtered = filtered.filter((athlete: any) => athlete.club === selectedClub.value)
-  }
+    if (activeTab.value === 'men') {
+      isShown &&= athlete.gender === 'Мужской'
+    }
 
-  // Filter by age group
-  if (selectedAgeGroup.value && selectedAgeGroup.value !== 'Все группы') {
-    filtered = filtered.filter((athlete: any) => athlete.ageGroup === selectedAgeGroup.value)
-  }
+    if (activeTab.value === 'women') {
+      isShown &&= athlete.gender === 'Женский'
+    }
 
-  return filtered
-})
-
-// Filtered data for men
-const filteredMenData = computed(() => {
-  if (!ratingData.value) return []
-
-  let filtered = ratingData.value.filter((athlete: any) => athlete.gender === 'Мужской')
-
-  // Filter by search query
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter((athlete: any) =>
-      athlete.fioRussian.toLowerCase().includes(query)
+    isShown &&= athlete.fioRussian.toLowerCase().includes(query)
       || athlete.fioEnglish.toLowerCase().includes(query)
-      || (athlete.club && athlete.club.toLowerCase().includes(query)),
-    )
-  }
+    if (selectedClub.value && selectedClub.value !== 'Все клубы') {
+      isShown &&= athlete.club === selectedClub.value
+    }
 
-  // Filter by club
-  if (selectedClub.value && selectedClub.value !== 'Все клубы') {
-    filtered = filtered.filter((athlete: any) => athlete.club === selectedClub.value)
-  }
+    if (selectedAgeGroup.value && selectedAgeGroup.value !== 'Все группы') {
+      isShown &&= athlete.ageGroup === selectedAgeGroup.value
+    }
 
-  // Filter by age group
-  if (selectedAgeGroup.value && selectedAgeGroup.value !== 'Все группы') {
-    filtered = filtered.filter((athlete: any) => athlete.ageGroup === selectedAgeGroup.value)
-  }
-
-  return filtered
+    return isShown
+  })
 })
 
-// Filtered data for women
-const filteredWomenData = computed(() => {
-  if (!ratingData.value) return []
-
-  let filtered = ratingData.value.filter((athlete: any) => athlete.gender === 'Женский')
-
-  // Filter by search query
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter((athlete: any) =>
-      athlete.fioRussian.toLowerCase().includes(query)
-      || athlete.fioEnglish.toLowerCase().includes(query),
-    )
-  }
-
-  // Filter by club
-  if (selectedClub.value && selectedClub.value !== 'Все клубы') {
-    filtered = filtered.filter((athlete: any) => athlete.club === selectedClub.value)
-  }
-
-  // Filter by age group
-  if (selectedAgeGroup.value && selectedAgeGroup.value !== 'Все группы') {
-    filtered = filtered.filter((athlete: any) => athlete.ageGroup === selectedAgeGroup.value)
-  }
-
-  return filtered
-})
-
-// Helper methods for current tab
-const getCurrentData = () => {
-  switch (activeTab.value) {
-    case 'men':
-      return filteredMenData.value
-    case 'women':
-      return filteredWomenData.value
-    default:
-      return filteredRatingData.value
-  }
-}
-
-const getCurrentCount = () => {
-  switch (activeTab.value) {
-    case 'men':
-      return filteredMenData.value.length
-    case 'women':
-      return filteredWomenData.value.length
-    default:
-      return filteredRatingData.value.length
-  }
-}
-
-const getCurrentTabLabel = () => {
-  switch (activeTab.value) {
-    case 'men':
-      return 'Мужчины'
-    case 'women':
-      return 'Женщины'
-    default:
-      return 'Все участники'
-  }
-}
-
-const getCurrentTabIcon = () => {
-  switch (activeTab.value) {
-    case 'men':
-      return 'i-heroicons-user'
-    case 'women':
-      return 'i-heroicons-user'
-    default:
-      return 'i-heroicons-users'
-  }
-}
-
-const getCurrentTabColor = () => {
-  switch (activeTab.value) {
-    case 'men':
-      return 'text-green-600'
-    case 'women':
-      return 'text-pink-600'
-    default:
-      return 'text-blue-600'
-  }
-}
-
-// Method to show athlete details
-const showAthleteDetails = (athlete: any) => {
+const showAthleteDetails = (athlete: License) => {
   selectedAthlete.value = athlete
   showDetailsDrawer.value = true
 }

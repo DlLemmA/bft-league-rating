@@ -8,7 +8,6 @@ import transformBrestAquathlon from './brestAquathlon'
 import transformLogoiskWinter from './logoisk-winter'
 import transformDrogichin from './drogichin'
 
-// Map of reader types to their respective transformers
 export const transformerMap = {
   obelarus: transformObelarus,
   obelarus2: transformObelarus2,
@@ -23,7 +22,6 @@ export const transformerMap = {
 
 export type ReaderType = keyof typeof transformerMap
 
-// Re-export individual transformers
 export {
   transformObelarus,
   transformObelarus2,

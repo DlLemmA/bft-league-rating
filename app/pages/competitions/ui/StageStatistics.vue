@@ -93,12 +93,11 @@
 
 <script setup lang="ts">
 interface Props {
-  results: any[]
+  results: unknown[]
 }
 
 const props = defineProps<Props>()
 
-// Helper methods
 const getStageEmoji = (type: string): string => {
   const emojis: Record<string, string> = {
     swim: '🏊',
@@ -131,7 +130,6 @@ const translateStageType = (type: string): string => {
   return translations[type] || type
 }
 
-// Format seconds to time string
 const formatTime = (seconds: number): string => {
   if (isNaN(seconds)) return '—'
 
@@ -141,7 +139,6 @@ const formatTime = (seconds: number): string => {
   return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
 }
 
-// Get all unique stage types from results
 const stageTypes = computed(() => {
   if (!props.results || props.results.length === 0) return []
 
@@ -149,7 +146,7 @@ const stageTypes = computed(() => {
 
   props.results.forEach((result) => {
     if (result.stages && Array.isArray(result.stages)) {
-      result.stages.forEach((stage: any) => {
+      result.stages.forEach((stage) => {
         if (stage.type) types.add(stage.type)
       })
     }
@@ -160,17 +157,15 @@ const stageTypes = computed(() => {
 
 const hasStages = computed(() => stageTypes.value.length > 0)
 
-// Calculate statistics for each stage type
 const stageStats = computed(() => {
   const stats: Record<string, { best: string, bestAthlete?: string, average: string, median: string }> = {}
 
   stageTypes.value.forEach((stageType) => {
-    // Get all times for this stage type
     const stageTimes: { seconds: number, time: string, athlete: string }[] = []
 
     props.results.forEach((result) => {
       if (result.stages && Array.isArray(result.stages)) {
-        const stage = result.stages.find((s: any) => s.type === stageType)
+        const stage = result.stages.find(s => s.type === stageType)
         if (stage && stage.time && stage.durationSeconds) {
           stageTimes.push({
             seconds: stage.durationSeconds,
@@ -186,17 +181,13 @@ const stageStats = computed(() => {
       return
     }
 
-    // Sort by time
     stageTimes.sort((a, b) => a.seconds - b.seconds)
 
-    // Best time
     const best = stageTimes[0]
 
-    // Average time
     const totalSeconds = stageTimes.reduce((sum, item) => sum + item.seconds, 0)
     const averageSeconds = totalSeconds / stageTimes.length
 
-    // Median time
     const mid = Math.floor(stageTimes.length / 2)
     const medianTime = stageTimes.length % 2 === 0
       ? stageTimes[mid - 1]

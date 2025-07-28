@@ -1,5 +1,4 @@
 <template>
-  <!-- Loading State -->
   <div
     v-if="pending"
     class="text-center py-12"
@@ -10,7 +9,6 @@
     </p>
   </div>
 
-  <!-- Error State -->
   <div
     v-else-if="error"
     class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-8"
@@ -21,7 +19,6 @@
     <pre class="mt-2 text-sm">{{ error }}</pre>
   </div>
 
-  <!-- Seasons -->
   <div
     v-else
     class="space-y-12"
@@ -36,6 +33,5 @@
 </template>
 
 <script setup lang="ts">
-// Load seasons data from API
 const { data: seasons, pending, error } = await useFetch('/api/seasons')
 </script>

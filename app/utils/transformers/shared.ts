@@ -1,14 +1,11 @@
 import type { License } from './license'
 import type { NameMapping } from './nameMapping'
 
-// Supported discipline types for different race formats
 export type DisciplineType = 'swim' | 'run' | 'bike' | 'transition1' | 'transition2' | 'ski' | 'stage1' | 'stage2' | 'stage3'
 
 export type RaceStage = {
   type: DisciplineType
   time: string
-  label?: string // Human-readable label for the stage
-  durationSeconds?: number // Duration in seconds for calculations
 }
 
 export type EventResult = {
@@ -84,9 +81,6 @@ export const timeToSeconds = (timeStr?: string): number | null => {
   }
 }
 
-/**
- * Format seconds to a time string (HH:MM:SS.mmm)
- */
 export const secondsToTime = (seconds: number): string => {
   if (seconds === null || isNaN(seconds)) return ''
 
@@ -102,25 +96,8 @@ export const secondsToTime = (seconds: number): string => {
   }
 }
 
-// Find stage time by type
-export const findStageTime = (stages: RaceStage[], type: string): string | undefined => {
-  return stages?.find(stage => stage.type === type)?.time
-}
-
-// Add calculated fields to participants
-export const addCalculatedFields = (participants: EventResult[]): EventResult[] => {
-  return participants.map(participant => ({
-    ...participant,
-    totalTimeSeconds: timeToSeconds(participant.totalTime),
-    stages: participant.stages.map(stage => ({
-      ...stage,
-      durationSeconds: timeToSeconds(stage.time) || 0,
-    })),
-  }))
-}
-
 /**
- * Calculate points based on the Scala algorithm
+ * Calculate points based on the algorithm
  * Points = basePoints * max(1 - (athleteTime - championTime) / (0.8 * championTime), 0)
  */
 export const calculatePoints = (
@@ -139,19 +116,6 @@ export const calculatePoints = (
 
   // Round to 2 decimal places
   return Math.round(points * 100) / 100
-}
-
-/**
- * Format trend value for display
- * Positive trend (improvement): ▲N
- * Negative trend (decline): ▼N
- * No change: −0
- */
-export const formatTrend = (trend: number | undefined): string => {
-  if (trend === undefined) return '−0'
-  if (trend < 0) return `▲${-trend}` // Negative trend value means position improved (moved up)
-  if (trend > 0) return `▼${trend}` // Positive trend value means position declined (moved down)
-  return '−0' // No change
 }
 
 /**
@@ -236,19 +200,4 @@ export const findMatchingLicense = (
   }
 
   return null
-
-  // Fallback: Fuzzy matching (partial match)
-  // const byPartialMatch = licenses.find(license => {
-  //   const russianName = license.fioRussian?.toLowerCase().trim() || ''
-  //   const englishName = license.fioEnglish?.toLowerCase().trim() || ''
-
-  //   return russianName.includes(resultName) ||
-  //          resultName.includes(russianName) ||
-  //          englishName.includes(resultName) ||
-  //          resultName.includes(englishName) ||
-  //          russianName.split(' ').some(part => resultName.includes(part)) ||
-  //          englishName.split(' ').some(part => resultName.includes(part))
-  // })
-
-  // return byPartialMatch || null
 }

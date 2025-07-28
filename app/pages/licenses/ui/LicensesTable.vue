@@ -1,6 +1,5 @@
 <template>
   <div class="space-y-4">
-    <!-- Desktop Table -->
     <div class="hidden md:block overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
@@ -125,7 +124,6 @@
       </table>
     </div>
 
-    <!-- Mobile Cards -->
     <div class="md:hidden space-y-3">
       <LicenseCard
         v-for="license in licenses"
@@ -138,7 +136,7 @@
 
 <script setup lang="ts">
 interface Props {
-  licenses: any[]
+  licenses: unknown[]
 }
 
 defineProps<Props>()
