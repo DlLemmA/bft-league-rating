@@ -22,7 +22,8 @@
                 Клуб
               </div>
             </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th v-if="hasCategories"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               <div class="flex items-center">
                 <UIcon name="i-heroicons-tag" class="mr-1" />
                 Категория
@@ -43,17 +44,51 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="result in filteredResults" :key="result.nickname" class="hover:bg-gray-50 cursor-pointer"
+          <tr v-for="result in results" :key="result.nickname" class="hover:bg-gray-50 cursor-pointer"
             @click="$emit('show-details', result)">
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="flex flex-col space-y-1">
-                <div v-for="(ranking, rankingIndex) in getResultRankings(result)" :key="rankingIndex" :class="[
-                  rankingIndex === 0 ? 'text-sm font-medium' : 'text-xs text-gray-600',
-                  ranking.highlighted ? ranking.color : '',
-                ]" class="flex items-center">
-                  <span v-if="ranking.medal" class="mr-1" :class="ranking.medalColor">{{ ranking.medal }}</span>
-                  {{ ranking.value }}
-                  <span v-if="ranking.suffix" class="ml-1" :class="ranking.suffixClass">{{ ranking.suffix }}</span>
+              <div :class="hasAgeGroupPlaces ? 'grid grid-cols-3 gap-2 text-xs' : 'grid grid-cols-2 gap-2 text-xs'">
+                <div :class="[
+                  'text-center p-1 rounded',
+                  getBestPlaceType(result) === 'absolute' ? 'bg-yellow-100 border border-yellow-300' : 'bg-gray-50',
+                ]">
+                  <div class="text-xs text-gray-500 mb-1">
+                    Общий
+                  </div>
+                  <div :class="getBestPlaceType(result) === 'absolute' ? 'text-yellow-700 font-bold' : 'text-gray-700'">
+                    {{ result.absolutePlace || '—' }}
+                  </div>
+                </div>
+
+                <div :class="[
+                  'text-center p-1 rounded',
+                  getBestPlaceType(result) === 'gender' ? (result.gender === 'male' ? 'bg-blue-100 border border-blue-300' : 'bg-pink-100 border border-pink-300') : 'bg-gray-50',
+                ]">
+                  <div class="text-xs text-gray-500 mb-1">
+                    {{ result.gender === 'male' ? 'Муж' : 'Жен' }}
+                  </div>
+                  <div
+                    :class="getBestPlaceType(result) === 'gender' ? (result.gender === 'male' ? 'text-blue-700 font-bold' : 'text-pink-700 font-bold') : 'text-gray-700'">
+                    <span v-if="result.genderAbsolutePlace && result.genderAbsolutePlace <= 3" class="mr-1">
+                      {{ result.genderAbsolutePlace === 1 ? '🥇' : result.genderAbsolutePlace === 2 ? '🥈' : '🥉' }}
+                    </span>
+                    {{ result.genderAbsolutePlace || '—' }}
+                  </div>
+                </div>
+
+                <div v-if="hasAgeGroupPlaces" :class="[
+                  'text-center p-1 rounded',
+                  getBestPlaceType(result) === 'ageGroup' ? 'bg-purple-100 border border-purple-300' : 'bg-gray-50',
+                ]">
+                  <div class="text-xs text-gray-500 mb-1">
+                    {{ result.ageGroup || 'Возраст' }}
+                  </div>
+                  <div :class="getBestPlaceType(result) === 'ageGroup' ? 'text-purple-700 font-bold' : 'text-gray-700'">
+                    <span v-if="result.ageGroupPlace && result.ageGroupPlace <= 3" class="mr-1">
+                      {{ result.ageGroupPlace === 1 ? '🥇' : result.ageGroupPlace === 2 ? '🥈' : '🥉' }}
+                    </span>
+                    {{ result.ageGroupPlace || '—' }}
+                  </div>
                 </div>
               </div>
             </td>
@@ -82,11 +117,11 @@
                 </div>
               </UTooltip>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div v-if="result.ageGroup" class="text-sm text-gray-900">
+            <td v-if="hasCategories" class="px-6 py-4 whitespace-nowrap">
+              <div v-if="result.category" class="text-sm text-gray-900">
                 <span
                   class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
-                  {{ result.ageGroup }}
+                  {{ result.category }}
                 </span>
               </div>
               <div v-else class="text-sm text-gray-500">
@@ -111,65 +146,99 @@
       </table>
     </div>
 
-    <div class="md:hidden space-y-4">
-      <div v-for="result in filteredResults" :key="result.nickname"
-        class="bg-white rounded-lg shadow p-4 border-l-4 cursor-pointer"
-        :class="result.license ? 'border-blue-500' : 'border-gray-200'" @click="$emit('show-details', result)">
-        <div class="flex justify-between items-start mb-3">
-          <div class="flex items-center">
-            <div :class="[
-              'rounded-full h-8 w-8 flex items-center justify-center mr-2',
-              getTopRanking(result) && getTopRanking(result).badgeClass ? getTopRanking(result).badgeClass : 'bg-gray-100',
-            ]">
-              <span v-if="getTopRanking(result) && getTopRanking(result).medal"
-                :class="getTopRanking(result) && getTopRanking(result).medalColor ? getTopRanking(result).medalColor : ''"
-                class="font-bold">
-                {{ getTopRanking(result).medal }}
-              </span>
-              <span v-else class="text-sm font-medium">{{ result && result.absolutePlace ? result.absolutePlace : ''
-              }}</span>
-            </div>
-            <div>
-              <div class="flex items-center space-x-3">
+    <div class="md:hidden space-y-3">
+      <div v-for="result in results" :key="result.nickname"
+        class="rounded-lg border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors bg-white"
+        @click="$emit('show-details', result)">
+        <div class="p-4 pb-3">
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex items-center flex-1 min-w-0">
+              <div class="flex-shrink-0 mr-3">
                 <UAvatar :src="result.license ? result.license.avatarSrc : null" :alt="result.nickname" size="sm" />
-                <div>
-                  <div class="font-medium">
-                    {{ result.nickname }}
-                  </div>
-                  <div v-if="result.birthYear" class="text-xs text-gray-500">
-                    {{ result.birthYear }} г.р.
-                  </div>
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <h3 class="font-semibold text-gray-900 truncate">
+                  {{ result.nickname }}
+                </h3>
+                <div class="flex items-center text-sm text-gray-600 mt-1">
+                  <UIcon v-if="result.license" name="i-heroicons-identification" class="mr-1" size="14" />
+                  <span v-if="result.license" class="mr-3">№{{ result.license.id }}</span>
+                  <UIcon name="i-heroicons-user" class="mr-1" size="14" />
+                  <span>{{ result.gender === 'male' ? 'Мужчина' : 'Женщина' }}</span>
                 </div>
               </div>
-              <div class="text-xs text-gray-500 flex flex-wrap items-center gap-1 mt-1">
-                <span v-if="result.club">{{ result.club }}</span>
-                <span v-if="result.club && result.ageGroup" class="mx-1">•</span>
-                <span v-if="result.ageGroup"
-                  class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
-                  {{ result.ageGroup }}
-                </span>
+            </div>
 
-                <span v-for="(ranking, rankingIndex) in getResultRankings(result)"
-                  v-if="rankingIndex === 0 || (ranking && ranking.alwaysShow)" :key="rankingIndex" :class="[
-                    'ml-1 px-1.5 py-0.5 rounded text-xs',
-                    ranking && ranking.badgeClass ? ranking.badgeClass : '',
-                  ]">
-                  {{ ranking ? ranking.mobileLabel : '' }}
-                  <span v-if="ranking && ranking.medal">{{ ranking.medal }}</span>
+            <div class="flex-shrink-0 text-right">
+              <div class="text-lg font-bold text-gray-900">
+                {{ result.totalTime }}
+              </div>
+              <div v-if="result.points" class="text-sm text-blue-600">
+                {{ result.points }} очков
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between text-sm">
+            <div class="flex items-center space-x-4">
+              <div v-if="result.club" class="flex items-center text-gray-600">
+                <UIcon name="i-heroicons-building-office" class="mr-1" size="14" />
+                <span class="truncate">{{ result.club }}</span>
+              </div>
+              <div v-if="hasCategories && result.category" class="flex items-center">
+                <span
+                  class="inline-flex items-center px-2 py-1 rounded-md text-sm font-medium bg-purple-100 text-purple-700">
+                  {{ result.category }}
                 </span>
               </div>
             </div>
           </div>
-          <div class="text-center">
-            <div class="font-medium">
-              {{ result.totalTime }}
+        </div>
+
+        <div class="px-4 py-3 bg-gray-50 border-t border-gray-100 rounded-b-lg">
+          <div :class="hasAgeGroupPlaces ? 'grid grid-cols-3 gap-2 text-sm' : 'grid grid-cols-2 gap-2 text-sm'">
+            <div :class="[
+              'text-center p-2 rounded',
+              getBestPlaceType(result) === 'absolute' ? 'bg-yellow-100 border border-yellow-300' : '',
+            ]">
+              <div class="text-xs text-gray-500 mb-1">
+                Общий
+              </div>
+              <div :class="getBestPlaceType(result) === 'absolute' ? 'text-yellow-700 font-bold' : 'text-gray-700'">
+                {{ result.absolutePlace || '—' }}
+              </div>
             </div>
-            <div v-if="result.points" class="text-xs text-blue-600">
-              {{ result.points }} очков
+
+            <div :class="[
+              'text-center p-2 rounded',
+              getBestPlaceType(result) === 'gender' ? (result.gender === 'male' ? 'bg-blue-100 border border-blue-300' : 'bg-pink-100 border border-pink-300') : '',
+            ]">
+              <div class="text-xs text-gray-500 mb-1">
+                {{ result.gender === 'male' ? 'Муж' : 'Жен' }}
+              </div>
+              <div
+                :class="getBestPlaceType(result) === 'gender' ? (result.gender === 'male' ? 'text-blue-700 font-bold' : 'text-pink-700 font-bold') : 'text-gray-700'">
+                <span v-if="result.genderAbsolutePlace && result.genderAbsolutePlace <= 3" class="mr-1">
+                  {{ result.genderAbsolutePlace === 1 ? '🥇' : result.genderAbsolutePlace === 2 ? '�' : '🥉' }}
+                </span>
+                {{ result.genderAbsolutePlace || '—' }}
+              </div>
             </div>
-            <div v-if="result.license" class="text-xs text-blue-600">
-              <UIcon name="i-heroicons-identification" class="mr-1" size="xs" />
-              {{ result.license.id }}
+
+            <div v-if="hasAgeGroupPlaces" :class="[
+              'text-center p-2 rounded',
+              getBestPlaceType(result) === 'ageGroup' ? 'bg-purple-100 border border-purple-300' : '',
+            ]">
+              <div class="text-xs text-gray-500 mb-1">
+                {{ result.ageGroup || 'Возраст' }}
+              </div>
+              <div :class="getBestPlaceType(result) === 'ageGroup' ? 'text-purple-700 font-bold' : 'text-gray-700'">
+                <span v-if="result.ageGroupPlace && result.ageGroupPlace <= 3" class="mr-1">
+                  {{ result.ageGroupPlace === 1 ? '🥇' : result.ageGroupPlace === 2 ? '🥈' : '🥉' }}
+                </span>
+                {{ result.ageGroupPlace || '—' }}
+              </div>
             </div>
           </div>
         </div>
@@ -181,352 +250,37 @@
 <script setup lang="ts">
 interface Props {
   results: unknown[]
-  searchQuery?: string
-  selectedClub?: string
-  selectedAgeGroup?: string
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  searchQuery: '',
-  selectedClub: '',
-  selectedAgeGroup: '',
-})
+const props = defineProps<Props>()
 
 defineEmits(['show-details'])
 
-interface PlaceRanking {
-  type: 'absolute' | 'gender' | 'ageGroup'
-  value: string
-  suffix?: string
-  suffixClass?: string
-  medal?: string
-  medalColor?: string
-  highlighted?: boolean
-  color?: string
-  priority: number
-  badgeClass?: string
-  mobileLabel: string
-  alwaysShow?: boolean
-  numericPlace?: number
-}
-
-const filteredResults = computed(() => {
-  if (!props.results) return []
-
-  let filtered = props.results
-
-  if (props.searchQuery) {
-    const query = props.searchQuery.toLowerCase()
-    filtered = filtered.filter(result =>
-      result.nickname.toLowerCase().includes(query)
-      || (result.club && result.club.toLowerCase().includes(query)),
-    )
-  }
-
-  if (props.selectedClub) {
-    filtered = filtered.filter(result => result.club === props.selectedClub)
-  }
-
-  if (props.selectedAgeGroup) {
-    filtered = filtered.filter(result => result.ageGroup === props.selectedAgeGroup)
-  }
-
-  return filtered
+const hasCategories = computed(() => {
+  return props.results.some(result => result.category)
 })
 
-const getResultRankings = (result: unknown): PlaceRanking[] => {
-  if (!result) return []
+const hasAgeGroupPlaces = computed(() => {
+  return props.results.some(result => result.ageGroupPlace)
+})
 
-  const rankings: PlaceRanking[] = []
+const getBestPlaceType = (result: unknown): 'absolute' | 'gender' | 'ageGroup' | null => {
+  const places = [
+    { type: 'absolute' as const, place: result.absolutePlace },
+    { type: 'gender' as const, place: result.genderAbsolutePlace },
+    ...(hasAgeGroupPlaces.value ? [{ type: 'ageGroup' as const, place: result.ageGroupPlace }] : []),
+  ].filter(p => p.place && p.place > 0)
 
-  if (result && result.absolutePlace !== undefined) {
-    let highlighted = false
-    let color = 'text-gray-900'
-    let badgeClass = 'bg-gray-100'
+  if (places.length === 0) return null
 
-    if (result.absolutePlace <= 3) {
-      highlighted = true
-      color = 'text-yellow-600'
-      badgeClass = 'bg-yellow-50 border border-yellow-200'
-    }
+  const bestPlace = Math.min(...places.map(p => p.place))
 
-    rankings.push({
-      type: 'absolute',
-      value: `${result.absolutePlace}`,
-      suffix: '(абс)',
-      suffixClass: 'text-xs text-gray-500',
-      medal: '',
-      medalColor: '',
-      highlighted,
-      color,
-      priority: result.absolutePlace <= 3 ? 1 : 4,
-      badgeClass,
-      mobileLabel: `${result.absolutePlace} место (абс)`,
-      alwaysShow: true,
-    })
+  const bestPlaces = places.filter(p => p.place === bestPlace)
+  if (bestPlaces.length > 1) {
+    const genderPlace = bestPlaces.find(p => p.type === 'gender')
+    if (genderPlace) return 'gender'
   }
 
-  if (result && result.genderAbsolutePlace !== undefined) {
-    let medal = ''
-    let medalColor = ''
-    let highlighted = false
-    let color = 'text-gray-600'
-    let badgeClass = result.gender === 'male' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800'
-
-    if (result.genderAbsolutePlace <= 3) {
-      highlighted = true
-      color = result.gender === 'male' ? 'text-blue-600' : 'text-pink-600'
-      badgeClass = result.gender === 'male' ? 'bg-blue-50 border border-blue-200' : 'bg-pink-50 border border-pink-200'
-
-      if (result.genderAbsolutePlace === 1) {
-        medal = '🥇'
-        medalColor = result.gender === 'male' ? 'text-blue-500' : 'text-pink-500'
-      }
-      else if (result.genderAbsolutePlace === 2) {
-        medal = '🥈'
-        medalColor = result.gender === 'male' ? 'text-blue-400' : 'text-pink-400'
-      }
-      else if (result.genderAbsolutePlace === 3) {
-        medal = '🥉'
-        medalColor = result.gender === 'male' ? 'text-blue-600' : 'text-pink-600'
-      }
-    }
-
-    rankings.push({
-      type: 'gender',
-      value: `${result.genderAbsolutePlace} место`,
-      suffix: result.gender === 'male' ? 'М' : 'Ж',
-      suffixClass: `ml-1 px-1.5 py-0.5 rounded text-xs ${badgeClass}`,
-      medal,
-      medalColor,
-      highlighted,
-      color,
-      priority: result.genderAbsolutePlace <= 3 ? 2 : 5,
-      badgeClass,
-      mobileLabel: `${result.genderAbsolutePlace} ${result.gender === 'male' ? 'М' : 'Ж'}`,
-      alwaysShow: result.genderAbsolutePlace <= 3,
-    })
-  }
-
-  if (result && result.ageGroupPlace !== undefined && result.ageGroup) {
-    let medal = ''
-    let medalColor = ''
-    let highlighted = false
-    let color = 'text-gray-600'
-    let badgeClass = 'bg-purple-100 text-purple-800'
-
-    const isTopGender = result.genderAbsolutePlace !== undefined && result.genderAbsolutePlace <= 3
-
-    if (result.ageGroupPlace <= 3 && !isTopGender) {
-      highlighted = true
-      color = 'text-purple-600'
-      badgeClass = 'bg-purple-50 border border-purple-200'
-
-      if (result.ageGroupPlace === 1) {
-        medal = '🥇'
-        medalColor = 'text-purple-500'
-      }
-      else if (result.ageGroupPlace === 2) {
-        medal = '🥈'
-        medalColor = 'text-purple-400'
-      }
-      else if (result.ageGroupPlace === 3) {
-        medal = '🥉'
-        medalColor = 'text-purple-600'
-      }
-    }
-
-    rankings.push({
-      type: 'ageGroup',
-      value: `${result.ageGroupPlace} место в ${result.ageGroup}`,
-      medal,
-      medalColor,
-      highlighted,
-      color,
-      priority: result.ageGroupPlace <= 3 && !isTopGender ? 3 : 6,
-      badgeClass,
-      mobileLabel: `${result.ageGroupPlace} место в ${result.ageGroup}`,
-      alwaysShow: result.ageGroupPlace <= 3,
-    })
-  }
-
-  rankings.forEach((ranking) => {
-    const placeMatch = ranking.value.match(/^(\d+)/)
-    ranking.numericPlace = placeMatch ? parseInt(placeMatch[1]) : 999
-  })
-
-  return rankings.sort((a, b) => {
-    if (a.numericPlace !== b.numericPlace) {
-      return a.numericPlace - b.numericPlace
-    }
-
-    if (a.type === 'absolute' && b.type !== 'absolute') {
-      return 1
-    }
-    if (a.type !== 'absolute' && b.type === 'absolute') {
-      return -1
-    }
-
-    const typePriority = {
-      ageGroup: 1,
-      gender: 2,
-      absolute: 3,
-    }
-
-    return typePriority[a.type] - typePriority[b.type]
-  })
-}
-
-const getTopRanking = (result: unknown): PlaceRanking => {
-  if (!result) return {
-    type: 'absolute',
-    value: '',
-    priority: 10,
-    badgeClass: 'bg-gray-100',
-    mobileLabel: '',
-    medal: '',
-    medalColor: '',
-    highlighted: false,
-    color: '',
-    alwaysShow: false,
-    numericPlace: 999,
-  }
-
-  const places = []
-
-  if (result.ageGroupPlace !== undefined && result.ageGroup) {
-    let medal = ''
-    let medalColor = ''
-    let badgeClass = 'bg-purple-100 text-purple-800'
-    let highlighted = false
-
-    const isTopGender = result.genderAbsolutePlace !== undefined && result.genderAbsolutePlace <= 3
-
-    if (result.ageGroupPlace <= 3 && !isTopGender) {
-      highlighted = true
-      badgeClass = 'bg-purple-50 border border-purple-200'
-
-      if (result.ageGroupPlace === 1) {
-        medal = '🥇'
-        medalColor = 'text-purple-500'
-      }
-      else if (result.ageGroupPlace === 2) {
-        medal = '🥈'
-        medalColor = 'text-purple-400'
-      }
-      else if (result.ageGroupPlace === 3) {
-        medal = '🥉'
-        medalColor = 'text-purple-600'
-      }
-    }
-
-    places.push({
-      type: 'ageGroup',
-      value: `${result.ageGroupPlace}`,
-      numericPlace: result.ageGroupPlace,
-      priority: 2,
-      badgeClass,
-      mobileLabel: `${result.ageGroupPlace} в ${result.ageGroup}`,
-      medal,
-      medalColor,
-      highlighted,
-      color: highlighted ? 'text-purple-600' : 'text-gray-600',
-      alwaysShow: result.ageGroupPlace <= 3,
-    })
-  }
-
-  if (result.genderAbsolutePlace !== undefined) {
-    let medal = ''
-    let medalColor = ''
-    let highlighted = false
-    let badgeClass = result.gender === 'male' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800'
-
-    if (result.genderAbsolutePlace <= 3) {
-      highlighted = true
-      badgeClass = result.gender === 'male' ? 'bg-blue-50 border border-blue-200' : 'bg-pink-50 border border-pink-200'
-
-      if (result.genderAbsolutePlace === 1) {
-        medal = '🥇'
-        medalColor = result.gender === 'male' ? 'text-blue-500' : 'text-pink-500'
-      }
-      else if (result.genderAbsolutePlace === 2) {
-        medal = '🥈'
-        medalColor = result.gender === 'male' ? 'text-blue-400' : 'text-pink-400'
-      }
-      else if (result.genderAbsolutePlace === 3) {
-        medal = '🥉'
-        medalColor = result.gender === 'male' ? 'text-blue-600' : 'text-pink-600'
-      }
-    }
-
-    places.push({
-      type: 'gender',
-      value: `${result.genderAbsolutePlace}`,
-      numericPlace: result.genderAbsolutePlace,
-      priority: 1,
-      badgeClass,
-      mobileLabel: `${result.genderAbsolutePlace} ${result.gender === 'male' ? 'М' : 'Ж'}`,
-      medal,
-      medalColor,
-      highlighted,
-      color: highlighted ? (result.gender === 'male' ? 'text-blue-600' : 'text-pink-600') : 'text-gray-600',
-      alwaysShow: result.genderAbsolutePlace <= 3,
-    })
-  }
-
-  if (result.absolutePlace !== undefined) {
-    places.push({
-      type: 'absolute',
-      value: `${result.absolutePlace}`,
-      numericPlace: result.absolutePlace,
-      priority: 3,
-      badgeClass: result.absolutePlace <= 3 ? 'bg-yellow-50 border border-yellow-200' : 'bg-gray-100',
-      mobileLabel: `${result.absolutePlace} (абс)`,
-      medal: '',
-      medalColor: '',
-      highlighted: result.absolutePlace <= 3,
-      color: result.absolutePlace <= 3 ? 'text-yellow-600' : 'text-gray-900',
-      alwaysShow: true,
-    })
-  }
-
-  places.sort((a, b) => {
-    if (a.numericPlace !== b.numericPlace) {
-      return a.numericPlace - b.numericPlace
-    }
-
-    if (a.type === 'absolute' && b.type !== 'absolute') {
-      return 1
-    }
-    if (a.type !== 'absolute' && b.type === 'absolute') {
-      return -1
-    }
-
-    const typePriority = {
-      ageGroup: 1,
-      gender: 2,
-      absolute: 3,
-    }
-
-    return typePriority[a.type] - typePriority[b.type]
-  })
-
-  if (places.length > 0) {
-    return places[0]
-  }
-
-  return {
-    type: 'absolute',
-    value: '',
-    numericPlace: 999,
-    priority: 10,
-    badgeClass: 'bg-gray-100',
-    mobileLabel: '',
-    medal: '',
-    medalColor: '',
-    highlighted: false,
-    color: '',
-    alwaysShow: false,
-  }
+  return bestPlaces[0].type
 }
 </script>

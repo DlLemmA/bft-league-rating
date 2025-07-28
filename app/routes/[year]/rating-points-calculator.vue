@@ -208,7 +208,7 @@ const breadcrumbLinks = [
     icon: 'i-heroicons-home',
   },
   {
-    label: 'Калькулятор рейтинга',
+    label: `Калькулятор рейтинга ${year}`,
     icon: 'i-heroicons-calculator',
   },
 ]

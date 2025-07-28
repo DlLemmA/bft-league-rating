@@ -3,10 +3,7 @@
     <template #header>
       <div class="flex justify-between items-start">
         <h2 class="text-xl font-bold flex items-center">
-          <UIcon
-            name="i-heroicons-trophy"
-            class="mr-2 text-blue-600"
-          />
+          <UIcon name="i-heroicons-trophy" class="mr-2 text-blue-600" />
           Детали результата
         </h2>
       </div>
@@ -14,130 +11,110 @@
     <template #body>
       <div class="mb-6">
         <div class="flex items-center space-x-3 mb-4">
-          <UAvatar
-            :src="result.license ? result.license.avatarSrc : null"
-            :alt="result.nickname"
-            size="lg"
-          />
+          <UAvatar :src="result.license ? result.license.avatarSrc : null" :alt="result.nickname" size="lg" />
           <div>
             <div class="text-lg font-medium">
               {{ result.nickname }}
             </div>
-            <div
-              v-if="result.birthYear"
-              class="text-sm text-gray-500"
-            >
+            <div v-if="result.birthYear" class="text-sm text-gray-500">
               {{ result.birthYear }} г.р.
             </div>
             <div class="flex flex-wrap items-center gap-2 mt-1">
-              <span
-                v-if="result.license"
-                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800"
-              >
-                <UIcon
-                  name="i-heroicons-identification"
-                  class="mr-1"
-                  size="xs"
-                />
+              <span v-if="result.license"
+                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                <UIcon name="i-heroicons-identification" class="mr-1" size="xs" />
                 {{ result.license.id }}
               </span>
-              <span
-                v-if="result.gender"
-                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
-                :class="result.gender === 'male' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800'"
-              >
-                <UIcon
-                  name="i-heroicons-user"
-                  class="mr-1"
-                  size="xs"
-                />
+              <span v-if="result.gender" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                :class="result.gender === 'male' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800'">
+                <UIcon name="i-heroicons-user" class="mr-1" size="xs" />
                 {{ result.gender === 'male' ? 'Мужчина' : 'Женщина' }}
               </span>
-              <span
-                v-if="result.ageGroup"
-                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800"
-              >
-                <UIcon
-                  name="i-heroicons-tag"
-                  class="mr-1"
-                  size="xs"
-                />
+              <span v-if="result.ageGroup"
+                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                <UIcon name="i-heroicons-tag" class="mr-1" size="xs" />
                 {{ result.ageGroup }}
-                <span
-                  v-if="result.ageGroupPlace"
-                  class="ml-1 font-bold"
-                >({{ result.ageGroupPlace }} место)</span>
+                <span v-if="result.ageGroupPlace" class="ml-1 font-bold">({{ result.ageGroupPlace }} место)</span>
               </span>
-              <span
-                v-if="result.club"
-                class="text-sm text-gray-600"
-              >{{ result.club }}</span>
+              <span v-if="result.club" class="text-sm text-gray-600">{{ result.club }}</span>
             </div>
           </div>
         </div>
 
         <div class="bg-blue-50 rounded-lg p-4 mb-6 border border-blue-100">
-          <div class="text-xl font-bold text-blue-700 flex items-center justify-between mb-2">
+          <div class="text-xl font-bold text-blue-700 flex items-center justify-between mb-4">
             <span>Общее время:</span>
             <span>{{ result.totalTime }}</span>
           </div>
-          <div class="flex flex-wrap gap-2">
-            <div
-              v-if="result.absolutePlace"
-              class="text-sm flex items-center"
-            >
-              <span class="font-medium">{{ result.absolutePlace }}</span>
-              <span class="text-gray-600 ml-1">место в абсолюте</span>
-              <span
-                v-if="result.absolutePlace <= 3"
-                class="ml-1"
-              >
-                {{ result.absolutePlace === 1 ? '🥇' : result.absolutePlace === 2 ? '🥈' : '🥉' }}
-              </span>
+
+          <div
+            :class="result.ageGroup && result.ageGroupPlace ? 'grid grid-cols-1 sm:grid-cols-3 gap-3' : 'grid grid-cols-1 sm:grid-cols-2 gap-3'">
+            <div :class="[
+              'text-center p-3 rounded-lg',
+              getBestPlaceType(result) === 'absolute' ? 'bg-yellow-100 border-2 border-yellow-300' : 'bg-white border border-gray-200',
+            ]">
+              <div class="text-xs text-gray-500 mb-1 font-medium">
+                Общий результат
+              </div>
+              <div
+                :class="getBestPlaceType(result) === 'absolute' ? 'text-yellow-700 font-bold text-lg' : 'text-gray-700 text-lg'">
+                {{ result.absolutePlace || '—' }}
+              </div>
             </div>
-            <div
-              v-if="result.genderAbsolutePlace"
-              class="text-sm flex items-center"
-            >
-              <span class="font-medium">{{ result.genderAbsolutePlace }}</span>
-              <span class="text-gray-600 ml-1">место среди {{ result.gender === 'male' ? 'мужчин' : 'женщин' }}</span>
-              <span
-                v-if="result.genderAbsolutePlace <= 3"
-                class="ml-1"
-              >
-                {{ result.genderAbsolutePlace === 1 ? '🥇' : result.genderAbsolutePlace === 2 ? '🥈' : '🥉' }}
-              </span>
+
+            <div :class="[
+              'text-center p-3 rounded-lg',
+              getBestPlaceType(result) === 'gender' ? (result.gender === 'male' ? 'bg-blue-100 border-2 border-blue-300' : 'bg-pink-100 border-2 border-pink-300') : 'bg-white border border-gray-200',
+            ]">
+              <div class="text-xs text-gray-500 mb-1 font-medium">
+                {{ result.gender === 'male' ? 'Среди мужчин' : 'Среди женщин' }}
+              </div>
+              <div
+                :class="getBestPlaceType(result) === 'gender' ? (result.gender === 'male' ? 'text-blue-700 font-bold text-lg' : 'text-pink-700 font-bold text-lg') : 'text-gray-700 text-lg'">
+                <span v-if="result.genderAbsolutePlace && result.genderAbsolutePlace <= 3" class="mr-1">
+                  {{ result.genderAbsolutePlace === 1 ? '🥇' : result.genderAbsolutePlace === 2 ? '🥈' : '🥉' }}
+                </span>
+                {{ result.genderAbsolutePlace || '—' }}
+              </div>
             </div>
-            <div
-              v-if="result.points"
-              class="text-sm flex items-center"
-            >
-              <span class="font-medium text-blue-600">{{ result.points }}</span>
-              <span class="text-gray-600 ml-1">очков</span>
+
+            <div v-if="result.ageGroup && result.ageGroupPlace" :class="[
+              'text-center p-3 rounded-lg',
+              getBestPlaceType(result) === 'ageGroup' ? 'bg-purple-100 border-2 border-purple-300' : 'bg-white border border-gray-200',
+            ]">
+              <div class="text-xs text-gray-500 mb-1 font-medium">
+                {{ result.ageGroup }}
+              </div>
+              <div
+                :class="getBestPlaceType(result) === 'ageGroup' ? 'text-purple-700 font-bold text-lg' : 'text-gray-700 text-lg'">
+                <span v-if="result.ageGroupPlace && result.ageGroupPlace <= 3" class="mr-1">
+                  {{ result.ageGroupPlace === 1 ? '🥇' : result.ageGroupPlace === 2 ? '🥈' : '🥉' }}
+                </span>
+                {{ result.ageGroupPlace }}
+              </div>
+            </div>
+          </div>
+
+          <div v-if="result.points" class="mt-4 pt-3 border-t border-blue-200">
+            <div class="text-center">
+              <div class="text-sm text-blue-600 mb-1">
+                Очки за результат
+              </div>
+              <div class="text-2xl font-bold text-blue-700">
+                {{ result.points }}
+              </div>
             </div>
           </div>
         </div>
 
-        <div
-          v-if="result.points && result.hasLicense"
-          class="bg-amber-50 rounded-lg p-4 mb-6 border border-amber-200"
-        >
+        <div v-if="result.points && result.hasLicense" class="bg-amber-50 rounded-lg p-4 mb-6 border border-amber-200">
           <div class="flex items-center justify-between mb-3">
             <h3 class="font-bold text-lg flex items-center">
-              <UIcon
-                name="i-heroicons-calculator"
-                class="mr-2 text-amber-600"
-              />
+              <UIcon name="i-heroicons-calculator" class="mr-2 text-amber-600" />
               Расчет очков
             </h3>
-            <NuxtLink
-              :to="calculatorLink"
-              class="text-xs text-blue-600 hover:text-blue-800 flex items-center"
-            >
-              <UIcon
-                name="i-heroicons-calculator"
-                class="w-3 h-3 mr-1"
-              />
+            <NuxtLink :to="calculatorLink" class="text-xs text-blue-600 hover:text-blue-800 flex items-center">
+              <UIcon name="i-heroicons-calculator" class="w-3 h-3 mr-1" />
               Показать подробный расчет
             </NuxtLink>
           </div>
@@ -155,113 +132,68 @@
           </div>
         </div>
 
-        <div
-          v-if="result.stages && result.stages.length > 0"
-          class="space-y-4"
-        >
+        <div v-if="result.stages && result.stages.length > 0" class="space-y-4">
           <div class="bg-gray-50 rounded-md p-4 border border-gray-200">
             <h3 class="font-bold text-lg mb-3 flex items-center">
-              <UIcon
-                name="i-heroicons-clock"
-                class="mr-2 text-blue-600"
-              />
+              <UIcon name="i-heroicons-clock" class="mr-2 text-blue-600" />
               Результаты по этапам:
             </h3>
 
-            <div class="space-y-3">
-              <div
-                v-for="(stage, index) in result.stages"
-                :key="index"
-                class="flex justify-between items-center p-3 bg-white rounded border"
-              >
-                <div class="flex items-center">
-                  <span class="mr-3 text-lg">{{ getStageEmoji(stage.type) }}</span>
-                  <div>
-                    <div class="font-medium">
-                      {{ translateStageType(stage.type) }}
-                    </div>
-                    <div
-                      v-if="stage.place"
-                      class="text-xs text-gray-500"
-                    >
-                      {{ stage.place }} место
-                    </div>
+            <UTimeline :items="timelineItems" size="sm" :ui="{
+              item: 'even:flex-row-reverse even:-translate-x-[calc(100%-2rem)] even:text-right',
+            }" class="translate-x-[calc(50%-1rem)]">
+              <template v-for="(stage, index) in result.stages" :key="index" #[`stage-${index}-indicator`]>
+                <span class="text-lg">{{ getStageEmoji(stage.type) }}</span>
+              </template>
+
+              <template v-for="(stage, index) in result.stages" :key="index" #[`stage-${index}-title`]>
+                <div>
+                  <div class="font-semibold">
+                    {{ translateStageType(stage.type) }}
+                  </div>
+                  <div class="text-sm text-gray-500">
+                    <span class="font-medium">{{ stage.time }}</span>
+                    <span v-if="stage.pace" class="ml-2">{{ stage.pace }}</span>
                   </div>
                 </div>
-                <div class="text-right">
-                  <div class="font-bold text-lg">
-                    {{ stage.time }}
-                  </div>
-                  <div
-                    v-if="stage.pace"
-                    class="text-xs text-gray-500"
-                  >
-                    {{ stage.pace }}
-                  </div>
-                </div>
-              </div>
-            </div>
+              </template>
+            </UTimeline>
           </div>
 
-          <div
-            v-if="hasStageStatistics"
-            class="bg-gray-50 rounded-md p-4 border border-gray-200"
-          >
+          <div v-if="hasStageStatistics" class="bg-gray-50 rounded-md p-4 border border-gray-200">
             <h3 class="font-bold text-lg mb-3 flex items-center">
-              <UIcon
-                name="i-heroicons-chart-bar"
-                class="mr-2 text-green-600"
-              />
+              <UIcon name="i-heroicons-chart-bar" class="mr-2 text-green-600" />
               Статистика по этапам:
             </h3>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div
-                v-if="bestStage"
-                class="p-3 bg-green-50 rounded border border-green-200"
-              >
+              <div v-if="bestStage" class="p-3 bg-green-50 rounded border border-green-200">
                 <div class="text-sm text-green-700 font-medium">
                   Лучший этап
                 </div>
                 <div class="flex items-center mt-1">
                   <span class="mr-2">{{ getStageEmoji(bestStage.type) }}</span>
                   <span class="font-bold">{{ translateStageType(bestStage.type) }}</span>
-                  <span
-                    v-if="bestStage.place"
-                    class="ml-2 text-sm"
-                  >({{ bestStage.place }} место)</span>
+                  <span v-if="bestStage.place" class="ml-2 text-sm">({{ bestStage.place }} место)</span>
                 </div>
               </div>
 
-              <div
-                v-if="worstStage"
-                class="p-3 bg-red-50 rounded border border-red-200"
-              >
+              <div v-if="worstStage" class="p-3 bg-red-50 rounded border border-red-200">
                 <div class="text-sm text-red-700 font-medium">
                   Слабый этап
                 </div>
                 <div class="flex items-center mt-1">
                   <span class="mr-2">{{ getStageEmoji(worstStage.type) }}</span>
                   <span class="font-bold">{{ translateStageType(worstStage.type) }}</span>
-                  <span
-                    v-if="worstStage.place"
-                    class="ml-2 text-sm"
-                  >({{ worstStage.place }} место)</span>
+                  <span v-if="worstStage.place" class="ml-2 text-sm">({{ worstStage.place }} место)</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div
-          v-else
-          class="bg-gray-50 rounded-md p-4 border border-gray-200 text-center"
-        >
-          <UIcon
-            name="i-heroicons-information-circle"
-            class="mx-auto mb-2 text-gray-400"
-            size="xl"
-          />
+        <div v-else class="bg-gray-50 rounded-md p-4 border border-gray-200 text-center">
+          <UIcon name="i-heroicons-information-circle" class="mx-auto mb-2 text-gray-400" size="xl" />
           <p class="text-gray-600">
             Детальная информация по этапам недоступна
           </p>
@@ -273,6 +205,7 @@
 
 <script setup lang="ts">
 import { useMediaQuery } from '@vueuse/core'
+import type { TimelineItem } from '@nuxt/ui'
 
 const isDesktop = useMediaQuery('(min-width: 768px)')
 
@@ -397,4 +330,37 @@ const calculatorLink = computed(() => {
   const queryString = params.toString()
   return `/${route.params.year}/distance-points-calculator${queryString ? '?' + queryString : ''}`
 })
+
+const timelineItems = computed((): TimelineItem[] => {
+  if (!props.result?.stages) return []
+
+  return props.result.stages.map((stage: any, index: number) => ({
+    title: translateStageType(stage.type),
+    color: 'primary',
+    time: stage.time,
+    pace: stage.pace,
+    emoji: getStageEmoji(stage.type),
+    slot: `stage-${index}`,
+  } as TimelineItem & { time: string, pace?: string, emoji: string, slot: string }))
+})
+
+const getBestPlaceType = (result: any): 'absolute' | 'gender' | 'ageGroup' | null => {
+  const places = [
+    { type: 'absolute' as const, place: result.absolutePlace },
+    { type: 'gender' as const, place: result.genderAbsolutePlace },
+    { type: 'ageGroup' as const, place: result.ageGroupPlace },
+  ].filter(p => p.place && p.place > 0)
+
+  if (places.length === 0) return null
+
+  const bestPlace = Math.min(...places.map(p => p.place))
+
+  const bestPlaces = places.filter(p => p.place === bestPlace)
+  if (bestPlaces.length > 1) {
+    const genderPlace = bestPlaces.find(p => p.type === 'gender')
+    if (genderPlace) return 'gender'
+  }
+
+  return bestPlaces[0].type
+}
 </script>

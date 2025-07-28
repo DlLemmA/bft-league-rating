@@ -279,7 +279,7 @@ const breadcrumbLinks = [
     icon: 'i-heroicons-home',
   },
   {
-    label: 'Калькулятор очков за дистанцию',
+    label: `Калькулятор очков за дистанцию ${year}`,
     icon: 'i-heroicons-calculator',
   },
 ]

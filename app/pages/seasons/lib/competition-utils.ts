@@ -1,4 +1,4 @@
-import type { SeasonInfo } from "~/types/seasonInfo"
+import type { SeasonInfo } from '~/types/seasonInfo'
 
 export const hasMultipleEvents = (competition: SeasonInfo['competitions'][number]) => {
   return competition && competition.events && competition.events.length > 0

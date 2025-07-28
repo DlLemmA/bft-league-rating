@@ -1,7 +1,5 @@
 import type { ResultsCollectionItem } from '@nuxt/content'
-import type { SeasonInfo } from '~/types/seasonInfo';
-
-
+import type { SeasonInfo } from '~/types/seasonInfo'
 
 const extractCompetitionMetaFromStem = (stem: string): { year: string, slug: string } => {
   // Format: "2025/results/braslav-kross/men"

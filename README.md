@@ -2,6 +2,18 @@
 
 Веб-приложение для отображения результатов соревнований и рейтинга участников Любительской Лиги триатлона Беларуси.
 
+## Благодарности
+
+<div align="center">
+  <a href="https://github.com/mkharytonau">
+    <img src="https://github.com/mkharytonau.png?size=60" width="60" height="60" style="border-radius: 50%; border: 2px solid #e5e7eb;" alt="mkharytonau">
+  </a>
+  <br><br>
+  <strong>Проект вдохновлен работой <a href="https://github.com/mkharytonau">@mkharytonau</a></strong>
+  <br>
+  <em><a href="https://github.com/mkharytonau/bft-league-rating">🔗 bft-league-rating</a></em>
+</div>
+
 ## Описание проекта
 
 Это приложение на базе Nuxt 4 предоставляет:
