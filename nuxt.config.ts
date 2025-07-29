@@ -46,5 +46,9 @@ export default defineNuxtConfig({
     clientBundle: {
       scan: true,
     }
+  },
+
+  colorMode: {
+    preference: 'light'
   }
 })
